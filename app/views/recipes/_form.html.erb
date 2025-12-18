@@ -1,0 +1,74 @@
+<%= form_with(model: recipe, local: true) do |f| %>
+<% if recipe.errors.any? %>
+<div class="errors">
+<h4><%= pluralize(recipe.errors.count, "error") %> prevented saving:</h4>
+<ul>
+<% recipe.errors.full_messages.each do |msg| %>
+<li><%= msg %></li>
+<% end %>
+</ul>
+</div>
+<% end %>
+
+
+<!-- Recipe Details -->
+<section class="card">
+<h3>Recipe Details</h3>
+<%= f.label :title %>
+<%= f.text_field :title, required: true %>
+
+
+<%= f.label :instructions %>
+<%= f.text_area :instructions, rows: 6 %>
+
+
+<%= f.label :prep_time, "Preparation Time (minutes)" %>
+<%= f.number_field :prep_time %>
+
+
+<%= f.label :servings %>
+<%= f.number_field :servings %>
+</section>
+
+
+<!-- Ingredients -->
+<section class="card">
+<h3>Ingredients</h3>
+
+
+<%= f.fields_for :recipe_ingredients do |ri| %>
+<div class="ingredient-row">
+<%= ri.collection_select :ingredient_id, Ingredient.all, :id, :name, prompt: "Select ingredient" %>
+<%= ri.text_field :quantity, placeholder: "e.g. 2 cups" %>
+<%= ri.check_box :_destroy %>
+<%= ri.label :_destroy, "Remove" %>
+</div>
+<% end %>
+
+
+<%= link_to "Add Ingredient", '#', id: "add-ingredient" %>
+</section>
+
+
+<!-- Tags -->
+<section class="card">
+<h3>Tags</h3>
+
+
+<%= f.collection_select :tag_ids, Tag.all, :id, :name, {}, multiple: true %>
+
+
+<%= f.label :new_tag_name, "New Tag" %>
+<%= f.text_field :new_tag_name, placeholder: "e.g. Vegan" %>
+</section>
+
+
+<!-- Comments -->
+<section class="card">
+<h3>Comments</h3>
+<p>Comments can be added after creating the recipe.</p>
+</section>
+
+
+<%= f.submit class: "btn-primary" %>
+<% end %>

@@ -1,0 +1,45 @@
+<h2><%= @recipe.title %></h2>
+
+
+<section class="card">
+<h3>Instructions</h3>
+<p><%= simple_format(@recipe.instructions) %></p>
+
+
+<p><strong>Prep Time:</strong> <%= @recipe.prep_time %> minutes</p>
+<p><strong>Servings:</strong> <%= @recipe.servings %></p>
+</section>
+
+
+<section class="card">
+<h3>Ingredients</h3>
+<ul>
+<% @recipe.recipe_ingredients.each do |ri| %>
+<li><%= ri.quantity %> <%= ri.ingredient.name %></li>
+<% end %>
+</ul>
+</section>
+
+
+<section class="card">
+<h3>Tags</h3>
+<% @recipe.tags.each do |tag| %>
+<span class="tag"><%= tag.name %></span>
+<% end %>
+</section>
+
+
+<section class="card">
+<h3>Comments</h3>
+<%= render @recipe.comments %>
+
+
+<%= form_with(model: [@recipe, @comment]) do |f| %>
+<%= f.text_area :body, rows: 3 %>
+<%= f.submit "Add Comment" %>
+<% end %>
+</section>
+
+
+<%= link_to "Edit", edit_recipe_path(@recipe), class: "btn" %>
+<%= link_to "Delete", recipe_path(@recipe), method: :delete, data: { confirm: "Are you sure?" }, class: "btn-danger" %>

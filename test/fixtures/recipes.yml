@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  instructions: MyText
+  prep_time: 9.99
+  servings: 9.99
+  user: one
+
+two:
+  title: MyString
+  instructions: MyText
+  prep_time: 9.99
+  servings: 9.99
+  user: two
