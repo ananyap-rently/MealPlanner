@@ -1,11 +1,172 @@
-<h2>Recipes</h2>
 
-<%= link_to "New Recipe", new_recipe_path, class: "btn-primary" %>
+<div class="container">
+  <div class="header">
+    <h1>My Recipes</h1>
+    <%= link_to "Create New Recipe", new_recipe_path, class: "btn btn-primary" %>
+  </div>
 
-<ul>
-  <% @recipes.each do |recipe| %>
-    <li>
-      <%= link_to recipe.title, recipe_path(recipe) %>
-    </li>
+  <% if @recipes.any? %>
+    <div class="recipes-grid">
+      <% @recipes.each do |recipe| %>
+        <div class="recipe-card">
+          <h2><%= link_to recipe.title, recipe_path(recipe) %></h2>
+          
+          <div class="recipe-meta">
+            <p><strong>Prep Time:</strong> <%= recipe.prep_time %> mins</p>
+            <p><strong>Servings:</strong> <%= recipe.servings %></p>
+          </div>
+
+          <% if recipe.tags.any? %>
+            <div class="tags">
+              <% recipe.tags.each do |tag| %>
+                <span class="tag"><%= tag.tag_name %></span>
+              <% end %>
+            </div>
+          <% end %>
+
+          <div class="recipe-actions">
+            <%= link_to "View", recipe_path(recipe), class: "btn btn-view" %>
+            <%= link_to "Edit", edit_recipe_path(recipe), class: "btn btn-edit" %>
+            <%= button_to "Delete", recipe_path(recipe), method: :delete, 
+                data: { turbo_confirm: "Are you sure?" }, 
+                class: "btn btn-delete" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <p>No recipes yet. Create your first recipe!</p>
+      <%= link_to "Create Recipe", new_recipe_path, class: "btn btn-primary" %>
+    </div>
   <% end %>
-</ul>
+</div>
+
+<style>
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 20px;
+  }
+
+  h1 {
+    color: #333;
+    font-size: 32px;
+    margin: 0;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+
+  .btn-view {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .btn-edit {
+    background-color: #ffc107;
+    color: #333;
+  }
+
+  .btn-delete {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .recipe-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #fff;
+  }
+
+  .recipe-card h2 {
+    margin-top: 0;
+    font-size: 20px;
+  }
+
+  .recipe-card h2 a {
+    color: #333;
+    text-decoration: none;
+  }
+
+  .recipe-card h2 a:hover {
+    color: #007bff;
+  }
+
+  .recipe-meta {
+    margin: 15px 0;
+    color: #666;
+  }
+
+  .recipe-meta p {
+    margin: 5px 0;
+  }
+
+  .tags {
+    margin: 15px 0;
+  }
+
+  .tag {
+    display: inline-block;
+    background-color: #e7f3ff;
+    color: #0066cc;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+
+  .recipe-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+
+  .empty-state p {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 20px;
+  }
+</style>

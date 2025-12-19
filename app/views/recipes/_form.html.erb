@@ -1,74 +1,114 @@
-<%= form_with(model: recipe, local: true) do |f| %>
-<% if recipe.errors.any? %>
-<div class="errors">
-<h4><%= pluralize(recipe.errors.count, "error") %> prevented saving:</h4>
-<ul>
-<% recipe.errors.full_messages.each do |msg| %>
-<li><%= msg %></li>
-<% end %>
-</ul>
+<div class="container">
+  <div class="form-header">
+    <h1><%= @recipe.new_record? ? "Create New Recipe" : "Edit Recipe" %></h1>
+  </div>
+
+  <%= form_with(model: @recipe, local: true) do |f| %>
+    <% if @recipe.errors.any? %>
+      <div class="error-messages">
+        <h3><%= pluralize(@recipe.errors.count, "error") %> prohibited this recipe from being saved:</h3>
+        <ul>
+          <% @recipe.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Basic Recipe Details Section -->
+    <div class="form-section">
+      <h2>Basic Details</h2>
+      
+      <div class="form-group">
+        <%= f.label :title, "Recipe Title" %>
+        <%= f.text_field :title, class: "form-control", placeholder: "e.g., Chocolate Chip Cookies" %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :instructions, "Cooking Instructions" %>
+        <%= f.text_area :instructions, rows: 8, class: "form-control", placeholder: "Describe step by step how to prepare this recipe..." %>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <%= f.label :prep_time, "Preparation Time (minutes)" %>
+          <%= f.number_field :prep_time, class: "form-control", placeholder: "30", min: 0 %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :servings, "Number of Servings" %>
+          <%= f.number_field :servings, class: "form-control", placeholder: "4", min: 1 %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ingredients Section -->
+    <div class="form-section">
+      <h2>Ingredients</h2>
+      <p class="help-text">Add ingredients with their quantities. You can select existing ingredients or create new ones.</p>
+      
+      <%= f.fields_for :recipe_ingredients do |ri| %>
+        <div class="ingredient-item">
+          <%= ri.hidden_field :id %>
+          <%= ri.hidden_field :_destroy, value: false %>
+          
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <%= ri.label :ingredient_id, "Select Ingredient" %>
+              <%= ri.collection_select :ingredient_id, Ingredient.all, :id, :name, 
+                  { prompt: "Choose an ingredient..." }, 
+                  { class: "form-control" } %>
+            </div>
+
+            <div class="form-group flex-1">
+              <%= ri.label :quantity, "Quantity" %>
+              <%= ri.text_field :quantity, class: "form-control", placeholder: "e.g., 2 cups" %>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <%= ri.label :new_ingredient_name, "Or add new ingredient" %>
+            <%= ri.text_field :new_ingredient_name, class: "form-control", placeholder: "Type new ingredient name" %>
+            <small class="help-text">Leave this blank if you selected an ingredient above</small>
+          </div>
+        </div>
+      <% end %>
+
+      <p class="help-text"><strong>Note:</strong> To add more ingredients, save the recipe first, then edit it to add additional ingredients.</p>
+    </div>
+
+    <!-- Tags Section -->
+    <div class="form-section">
+      <h2>Tags</h2>
+      <p class="help-text">Select existing tags or create a new one.</p>
+
+      <div class="form-group">
+        <%= f.label :tag_ids, "Select Tags (check all that apply)" %>
+        <div class="checkbox-group">
+          <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :tag_name do |b| %>
+            <div class="checkbox-item">
+              <%= b.check_box %>
+              <%= b.label %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :new_tag_name, "Or create a new tag" %>
+        <%= f.text_field :new_tag_name, class: "form-control", placeholder: "e.g., Dessert, Healthy, Quick" %>
+        <small class="help-text">Enter one tag name. It will be created and assigned to this recipe.</small>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <%= link_to "Cancel", @recipe.new_record? ? recipes_path : recipe_path(@recipe), class: "btn btn-secondary" %>
+      <%= f.submit @recipe.new_record? ? "Create Recipe" : "Update Recipe", class: "btn btn-primary" %>
+    </div>
+  <% end %>
 </div>
-<% end %>
 
-
-<!-- Recipe Details -->
-<section class="card">
-<h3>Recipe Details</h3>
-<%= f.label :title %>
-<%= f.text_field :title, required: true %>
-
-
-<%= f.label :instructions %>
-<%= f.text_area :instructions, rows: 6 %>
-
-
-<%= f.label :prep_time, "Preparation Time (minutes)" %>
-<%= f.number_field :prep_time %>
-
-
-<%= f.label :servings %>
-<%= f.number_field :servings %>
-</section>
-
-
-<!-- Ingredients -->
-<section class="card">
-<h3>Ingredients</h3>
-
-
-<%= f.fields_for :recipe_ingredients do |ri| %>
-<div class="ingredient-row">
-<%= ri.collection_select :ingredient_id, Ingredient.all, :id, :name, prompt: "Select ingredient" %>
-<%= ri.text_field :quantity, placeholder: "e.g. 2 cups" %>
-<%= ri.check_box :_destroy %>
-<%= ri.label :_destroy, "Remove" %>
-</div>
-<% end %>
-
-
-<%= link_to "Add Ingredient", '#', id: "add-ingredient" %>
-</section>
-
-
-<!-- Tags -->
-<section class="card">
-<h3>Tags</h3>
-
-
-<%= f.collection_select :tag_ids, Tag.all, :id, :name, {}, multiple: true %>
-
-
-<%= f.label :new_tag_name, "New Tag" %>
-<%= f.text_field :new_tag_name, placeholder: "e.g. Vegan" %>
-</section>
-
-
-<!-- Comments -->
-<section class="card">
-<h3>Comments</h3>
-<p>Comments can be added after creating the recipe.</p>
-</section>
-
-
-<%= f.submit class: "btn-primary" %>
-<% end %>
+# <style>
+  
+# </style>

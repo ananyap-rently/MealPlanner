@@ -11,8 +11,9 @@ class RecipesController < ApplicationController
   end
 
   def new
-    @recipe = Recipe.new
-  end
+  @recipe = Recipe.new
+  3.times { @recipe.recipe_ingredients.build }  # Creates 3 empty ingredient fields
+end
   def edit
 
   end

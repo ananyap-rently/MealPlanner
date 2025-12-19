@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  meal_plan: one
+  plannable: one
+  plannable_type: Plannable
+  scheduled_date: 2025-12-19
+  meal_slot: MyString
+
+two:
+  meal_plan: two
+  plannable: two
+  plannable_type: Plannable
+  scheduled_date: 2025-12-19
+  meal_slot: MyString
