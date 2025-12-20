@@ -2,7 +2,7 @@ class ShoppingListItemsController < ApplicationController
   before_action :set_shopping_list_item, only: [:update, :destroy]
 
   def index
-    @shopping_list_items = current_user.shopping_list_items.includes(:purchasable)
+    @shopping_list_items = current_user.shopping_list_items.includes(:purchasable, :payment)
   end
 
   def update

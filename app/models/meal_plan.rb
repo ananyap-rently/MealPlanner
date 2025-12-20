@@ -1,7 +1,7 @@
 class MealPlan < ApplicationRecord
   belongs_to :user
   has_many :meal_plan_items, dependent: :destroy
-  has_many :shopping_list_items
+  has_many :shopping_list_items, dependent: :destroy
   has_many :recipes, through: :meal_plan_items, source: :plannable, source_type: 'Recipe'
   has_many :comments, as: :commentable, dependent: :destroy
   validates :category, presence: true
@@ -18,3 +18,4 @@ class MealPlan < ApplicationRecord
   (start_date..start_date + 6.days).to_a
 end
 end
+

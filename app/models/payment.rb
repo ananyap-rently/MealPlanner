@@ -1,0 +1,22 @@
+class Payment < ApplicationRecord
+  belongs_to :shopping_list_item
+  
+  validates :payment_status, presence: true, inclusion: { in: %w[pending completed] }
+  
+  # Scope for filtering
+  scope :pending, -> { where(payment_status: 'pending') }
+  scope :completed, -> { where(payment_status: 'completed') }
+  
+  def item_name
+    case shopping_list_item.purchasable_type
+    when "Recipe"
+      shopping_list_item.purchasable.title
+    when "Item"
+      shopping_list_item.purchasable.item_name
+    when "Ingredient"
+      shopping_list_item.purchasable.name
+    else
+      "Unknown Item"
+    end
+  end
+end

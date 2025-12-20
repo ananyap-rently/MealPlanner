@@ -1,0 +1,166 @@
+<div class="payment-container">
+  <div class="payment-header">
+    <h1>💳 Payment Tracker</h1>
+  </div>
+
+  <% if notice %>
+    <div class="payment-alert payment-alert-success"><%= notice %></div>
+  <% end %>
+
+  <% if alert %>
+    <div class="payment-alert payment-alert-danger"><%= alert %></div>
+  <% end %>
+
+  <!-- Summary Cards -->
+  <div class="payment-summary">
+    <div class="payment-summary-card total">
+      <h5>Total Items</h5>
+      <h2><%= @payments.count %></h2>
+    </div>
+    <div class="payment-summary-card pending">
+      <h5>Pending</h5>
+      <h2><%= @pending_payments.count %></h2>
+    </div>
+    <div class="payment-summary-card completed">
+      <h5>Completed</h5>
+      <h2><%= @completed_payments.count %></h2>
+    </div>
+  </div>
+
+  <!-- Pending Payments -->
+  <div class="payment-card">
+    <div class="payment-card-header">
+      <h4>⏳ Pending Payments</h4>
+    </div>
+    <div class="payment-card-body">
+      <% if @pending_payments.any? %>
+        <table class="payment-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Type</th>
+              <th>Added On</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @pending_payments.each do |payment| %>
+              <tr>
+                <td data-label="Item">
+                  <span class="payment-item-name"><%= payment.item_name %></span>
+                </td>
+                <td data-label="Quantity">
+                  <span class="payment-quantity"><%= payment.shopping_list_item.quantity %></span>
+                </td>
+                <td data-label="Type">
+                  <span class="payment-badge badge-<%= payment.shopping_list_item.purchasable_type.downcase %>">
+                    <%= payment.shopping_list_item.purchasable_type %>
+                  </span>
+                </td>
+                <td data-label="Added On">
+                  <span class="payment-date"><%= payment.created_at.strftime("%b %d, %Y") %></span>
+                </td>
+                <td data-label="Actions">
+                  <%= form_with model: payment, 
+                      url: payment_path(payment), 
+                      method: :patch, 
+                      local: true,
+                      class: "d-inline" do |f| %>
+                    <%= f.hidden_field :payment_status, value: 'completed' %>
+                    <%= f.button "✓ Mark as Paid", 
+                        type: :submit,
+                        class: "payment-btn payment-btn-success",
+                        data: { turbo_confirm: "Mark this payment as completed?" } %>
+                  <% end %>
+                  <%= button_to "Remove", 
+                      payment_path(payment),
+                      method: :delete,
+                      class: "payment-btn payment-btn-danger",
+                      form: { data: { turbo_confirm: "Remove this from payments?" } } %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="payment-empty-state">
+          <p>🎉 No pending payments. Great job!</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Completed Payments -->
+  <div class="payment-card">
+    <div class="payment-card-header">
+      <h4>✅ Completed Payments</h4>
+      <% if @completed_payments.any? %>
+        <%= button_to "Clear Completed", 
+            clear_completed_payments_path,
+            method: :delete,
+            class: "payment-btn payment-btn-warning",
+            form: { data: { turbo_confirm: "Remove all completed payments?" } } %>
+      <% end %>
+    </div>
+    <div class="payment-card-body">
+      <% if @completed_payments.any? %>
+        <table class="payment-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Type</th>
+              <th>Completed On</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @completed_payments.each do |payment| %>
+              <tr class="completed-row">
+                <td data-label="Item">
+                  <span class="payment-item-name">
+                    <%= payment.item_name %>
+                    <span class="payment-badge badge-paid">✓ Paid</span>
+                  </span>
+                </td>
+                <td data-label="Quantity">
+                  <span class="payment-quantity"><%= payment.shopping_list_item.quantity %></span>
+                </td>
+                <td data-label="Type">
+                  <span class="payment-badge badge-<%= payment.shopping_list_item.purchasable_type.downcase %>">
+                    <%= payment.shopping_list_item.purchasable_type %>
+                  </span>
+                </td>
+                <td data-label="Completed On">
+                  <span class="payment-date"><%= payment.updated_at.strftime("%b %d, %Y") %></span>
+                </td>
+                <td data-label="Actions">
+                  <%= form_with model: payment, 
+                      url: payment_path(payment), 
+                      method: :patch, 
+                      local: true,
+                      class: "d-inline" do |f| %>
+                    <%= f.hidden_field :payment_status, value: 'pending' %>
+                    <%= f.button "↺ Undo", 
+                        type: :submit,
+                        class: "payment-btn payment-btn-warning",
+                        data: { turbo_confirm: "Mark as pending again?" } %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="payment-empty-state">
+          <p>📋 No completed payments yet.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="margin-top: 30px;">
+    <%= link_to "← Back to Shopping List", shopping_list_items_path, class: "payment-btn payment-btn-secondary" %>
+  </div>
+</div>

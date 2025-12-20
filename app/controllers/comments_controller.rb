@@ -5,15 +5,11 @@ class CommentsController < ApplicationController
         @comment.user = current_user
         @comment.save
         redirect_to @commentable
-        @meal_plan = MealPlan.find(params[:meal_plan_id])
-    @comment = @meal_plan.comments.build(comment_params)
+    #     @meal_plan = MealPlan.find(params[:meal_plan_id])
+    # @comment = @meal_plan.comments.build(comment_params)
     
 
-    # if @comment.save
-    #   redirect_to @meal_plan, notice: "Comment added!"
-    # else
-    #   render :new
-    # end
+    
     end
 
     def destroy

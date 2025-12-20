@@ -5,22 +5,26 @@ Rails.application.routes.draw do
   end
 
   # Meal Plans routes
-  resources :meal_plans, only: [:index, :create, :show, :destroy] do
-    # Meal Plan Items nested under Meal Plans
+  resources :meal_plans do
     resources :meal_plan_items, only: [:create, :destroy] do
-      member do
+      collection do
         post :add_to_shopping_list
       end
     end
-
-    # Comments nested under Meal Plans
+    
     resources :comments, only: [:create, :destroy]
   end
 
-  # Shopping List Items routes
+  # Shopping List Items
   resources :shopping_list_items, only: [:index, :update, :destroy] do
     collection do
       delete :clear_purchased
+    end
+  end
+
+  resources :payments, only: [:index, :create, :update, :destroy] do
+    collection do
+      delete :clear_completed
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

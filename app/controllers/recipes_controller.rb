@@ -12,7 +12,7 @@ class RecipesController < ApplicationController
 
   def new
   @recipe = Recipe.new
-  3.times { @recipe.recipe_ingredients.build }  # Creates 3 empty ingredient fields
+  #3.times { @recipe.recipe_ingredients.build }  # Creates 3 empty ingredient fields
 end
   def edit
 
@@ -48,7 +48,7 @@ end
       :servings, 
       :new_tag_name,
       tag_ids: [], 
-      recipe_ingredients_attributes: [:id, :ingredient_id, :quantity, :_destroy, :new_ingredient_name]
+      recipe_ingredients_attributes: [:id, :ingredient_id, :quantity, :unit, :_destroy, :new_ingredient_name]
     )
   end
 
