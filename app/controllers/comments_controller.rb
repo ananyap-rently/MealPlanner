@@ -5,10 +5,6 @@ class CommentsController < ApplicationController
         @comment.user = current_user
         @comment.save
         redirect_to @commentable
-    #     @meal_plan = MealPlan.find(params[:meal_plan_id])
-    # @comment = @meal_plan.comments.build(comment_params)
-    
-
     
     end
 

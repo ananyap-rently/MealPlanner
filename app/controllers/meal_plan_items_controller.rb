@@ -2,17 +2,15 @@ class MealPlanItemsController < ApplicationController
   before_action :set_meal_plan
 
   def create
-    puts "DEBUG: Params received: #{params.inspect}" # Check your terminal for this!
+    
     @meal_plan_item = @meal_plan.meal_plan_items.new(meal_plan_item_params)
     assign_plannable
 
-    # 'commit' exists only when the "Add to Plan" button is clicked
+    
     if params[:commit] == "Add to Plan"
-      puts "DEBUG: meal_slot before save: #{@meal_plan_item.meal_slot.inspect}"
+    
 
       if @meal_plan_item.save
-         puts "DEBUG: meal_slot after save: #{@meal_plan_item.reload.meal_slot.inspect}"
-     
         slot = @meal_plan_item.meal_slot&.capitalize || "Item"
         date = @meal_plan_item.scheduled_date&.strftime('%A, %B %d') || "TBD"
 
@@ -41,43 +39,87 @@ redirect_to @meal_plan,
   
   def add_to_shopping_list
   added_count = 0
+  merged_count = 0
 
   @meal_plan.meal_plan_items.includes(plannable: :recipe_ingredients).each do |mpi|
     next unless mpi.plannable.present?
 
     case mpi.plannable
     when Recipe
-      add_recipe_ingredients_to_shopping_list(mpi.plannable)
-      added_count += mpi.plannable.recipe_ingredients.count
+      result = add_recipe_ingredients_to_shopping_list(mpi.plannable)
+      added_count += result[:added]
+      merged_count += result[:merged]
 
     when Item
-      shopping_item = current_user.shopping_list_items.find_or_create_by!(
-        purchasable: mpi.plannable
-      ) do |sli|
-        sli.quantity = mpi.plannable.quantity || "1"
-        sli.is_purchased = false
+      # Check if item already exists in shopping list (unpurchased only)
+      existing_item = current_user.shopping_list_items
+                                  .where(purchasable: mpi.plannable, is_purchased: false)
+                                  .first
+      
+      if existing_item
+        # Merge quantities
+        existing_qty = existing_item.quantity.to_s.to_f
+        new_qty = (mpi.plannable.quantity || "1").to_f
+        merged_qty = existing_qty + new_qty
+        
+        existing_item.update(quantity: merged_qty.to_s)
+        merged_count += 1
+      else
+        # Create new item
+        current_user.shopping_list_items.create!(
+          purchasable: mpi.plannable,
+          quantity: mpi.plannable.quantity || "1",
+          is_purchased: false
+        )
+        added_count += 1
       end
-
-      added_count += 1 if shopping_item.persisted?
     end
   end
 
+  message = []
+  message << "#{added_count} new items added" if added_count > 0
+  message << "#{merged_count} items merged" if merged_count > 0
+  
   redirect_to shopping_list_items_path,
-              notice: "✓ Ingredients added to your shopping list!"
+              notice: message.any? ? "✓ #{message.join(', ')} to your shopping list!" : "✓ Shopping list updated!"
 end
 
   private
 
   # for adding ingredients
-  def add_recipe_ingredients_to_shopping_list(recipe)
+  private
+
+def add_recipe_ingredients_to_shopping_list(recipe)
+  added = 0
+  merged = 0
+  
   recipe.recipe_ingredients.includes(:ingredient).each do |ri|
-    current_user.shopping_list_items.find_or_create_by!(
-      purchasable: ri.ingredient
-    ) do |sli|
-      sli.quantity = "#{ri.quantity} #{ri.unit}"
-      sli.is_purchased = false
+    # Check if ingredient already exists in shopping list (unpurchased only)
+    existing_item = current_user.shopping_list_items
+                                .where(purchasable: ri.ingredient, is_purchased: false)
+                                .first
+    
+    if existing_item
+      # Merge quantities: parse existing quantity and add new quantity
+      existing_qty = existing_item.quantity.to_s.split.first.to_f  # Extract number from "2 cups"
+      new_qty = ri.quantity.to_f
+      merged_qty = existing_qty + new_qty
+      
+      # Update with merged quantity and keep the unit
+      existing_item.update(quantity: "#{merged_qty} #{ri.unit}")
+      merged += 1
+    else
+      # Create new item if it doesn't exist
+      current_user.shopping_list_items.create!(
+        purchasable: ri.ingredient,
+        quantity: "#{ri.quantity} #{ri.unit}",
+        is_purchased: false
+      )
+      added += 1
     end
   end
+  
+  { added: added, merged: merged }
 end
 
 
@@ -106,8 +148,8 @@ end
       if params[:new_item_name].present?
         # Logic for "Create a new item using a text field"
         item = Item.find_or_create_by(item_name: params[:new_item_name].strip) do |new_item|
-          new_item.quantity = params[:new_item_quantity]&.strip if params[:new_item_quantity].present?
-          new_item.user = current_user if Item.column_names.include?('user_id')
+            new_item.quantity = params[:new_item_quantity]&.strip if params[:new_item_quantity].present?
+            new_item.user = current_user if Item.column_names.include?('user_id')
         end
         
         # Update quantity if item already exists and new quantity provided
@@ -134,6 +176,6 @@ end
     @items_by_date = @meal_plan.meal_plan_items
                                 .includes(:plannable)
                                 .order(:scheduled_date, :meal_slot)
-                                .group_by { |item| item.scheduled_date.to_date } # Add .to_date here
+                                .group_by { |item| item.scheduled_date.to_date } 
   end
 end

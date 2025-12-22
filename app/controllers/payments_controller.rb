@@ -10,7 +10,7 @@ class PaymentsController < ApplicationController
   def create
     @shopping_list_item = current_user.shopping_list_items.find(params[:shopping_list_item_id])
     
-    # Check if payment already exists for this item
+  
     if @shopping_list_item.payment.present?
       redirect_to shopping_list_items_path, alert: "This item is already added to payments."
       return
@@ -61,8 +61,6 @@ class PaymentsController < ApplicationController
 
   def get_item_name(shopping_list_item)
     case shopping_list_item.purchasable_type
-    when "Recipe"
-      shopping_list_item.purchasable.title
     when "Item"
       shopping_list_item.purchasable.item_name
     when "Ingredient"

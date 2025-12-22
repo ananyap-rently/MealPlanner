@@ -1,0 +1,197 @@
+<div class="summaries-container">
+  <div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 summaries-header">
+      <h1>📊 Dashboard Summary</h1>
+      <div>
+        <%= link_to "← Back to Home", root_path, class: "btn btn-back" %>
+      </div>
+    </div>
+
+    <!-- Quick Navigation Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3 mb-3">
+        <%= link_to summaries_recipes_path, class: "text-decoration-none" do %>
+          <div class="card summary-nav-card recipe-card text-center h-100">
+            <div class="card-body">
+              <h5 class="card-title text-primary">📚 Recipes</h5>
+              <h2 class="display-4 text-primary"><%= @total_recipes %></h2>
+              <p class="text-muted mb-0">Total Recipes</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <div class="col-md-3 mb-3">
+        <%= link_to summaries_meal_plans_path, class: "text-decoration-none" do %>
+          <div class="card summary-nav-card mealplan-card text-center h-100">
+            <div class="card-body">
+              <h5 class="card-title text-success">🗓️ Meal Plans</h5>
+              <h2 class="display-4 text-success"><%= @active_meal_plans %></h2>
+              <p class="text-muted mb-0">Active Plans</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <div class="col-md-3 mb-3">
+        <%= link_to summaries_shopping_path, class: "text-decoration-none" do %>
+          <div class="card summary-nav-card shopping-card text-center h-100">
+            <div class="card-body">
+              <h5 class="card-title text-warning">🛒 Shopping</h5>
+              <h2 class="display-4 text-warning"><%= @pending_items %></h2>
+              <p class="text-muted mb-0">Items Pending</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <div class="col-md-3 mb-3">
+        <%= link_to summaries_payments_path, class: "text-decoration-none" do %>
+          <div class="card summary-nav-card payment-card text-center h-100">
+            
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Recipe Summary Section -->
+    <div class="card summary-section-card recipe-section mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">📚 Recipe Summary</h4>
+        
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="stat-header">Total Recipes: <span class="badge bg-primary summary-badge"><%= @total_recipes %></span></h6>
+            <h6 class="stat-header">Total Unique Ingredients: <span class="badge bg-info summary-badge"><%= @total_ingredients_used %></span></h6>
+            
+            <% if @recipes_by_category.any? %>
+              <h6 class="stat-header mt-4">Recipes by Category:</h6>
+              <ul class="summary-list">
+                <% @recipes_by_category.each do |category, count| %>
+                  <li>
+                    <span><span class="badge bg-secondary"><%= category || "Uncategorized" %></span></span>
+                    <span class="badge bg-light text-dark"><%= count %> recipes</span>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          </div>
+          
+          <div class="col-md-6">
+            <% if @most_used_recipes.any? %>
+              <h6 class="stat-header">Top 5 Most Used Recipes:</h6>
+              <ol class="summary-ordered-list">
+                <% @most_used_recipes.first(5).each do |recipe_data, count| %>
+                  <li><strong><%= recipe_data[1] %></strong> <span class="text-muted">- used <%= count %> times</span></li>
+                <% end %>
+              </ol>
+            <% else %>
+              <div class="empty-state">
+                <p class="text-muted">No recipe usage data yet</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Meal Plan Summary Section -->
+    <div class="card summary-section-card mealplan-section mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">🗓️ Meal Plan Summary</h4>
+      
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <h6 class="stat-header">Total Meal Plans: <span class="badge bg-primary summary-badge"><%= @total_meal_plans %></span></h6>
+            <h6 class="stat-header">Active Plans: <span class="badge bg-success summary-badge"><%= @active_meal_plans %></span></h6>
+            <h6 class="stat-header">Completed Plans: <span class="badge bg-secondary summary-badge"><%= @completed_meal_plans %></span></h6>
+            <h6 class="stat-header">This Week's Meals: <span class="badge bg-info summary-badge"><%= @current_week_meals %></span></h6>
+          </div>
+          
+          <div class="col-md-4">
+            <% if @meals_by_slot.any? %>
+              <h6 class="stat-header">Meals by Slot:</h6>
+              <ul class="summary-list">
+                <% @meals_by_slot.each do |slot, count| %>
+                  <li>
+                    <span><span class="badge bg-secondary"><%= slot&.capitalize || "Unscheduled" %></span></span>
+                    <span class="badge bg-light text-dark"><%= count %> meals</span>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          </div>
+          
+          <div class="col-md-4">
+            <% if @upcoming_meals.any? %>
+              <h6 class="stat-header">Upcoming Meals (Next 3):</h6>
+              <ul class="summary-unordered-list upcoming-meals-list">
+                <% @upcoming_meals.first(3).each do |meal_plan| %>
+                  <% meal_plan.meal_plan_items.first(1).each do |item| %>
+                    <li>
+                      <strong><%= item.scheduled_date.strftime('%b %d') %></strong> - 
+                      <%= item.plannable.try(:title) || item.plannable.try(:item_name) %>
+                    </li>
+                  <% end %>
+                <% end %>
+              </ul>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shopping Summary Section -->
+    <div class="card summary-section-card shopping-section mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">🛒 Shopping Summary</h4>
+       
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="stat-header">Total Items: <span class="badge bg-primary summary-badge"><%= @total_shopping_items %></span></h6>
+            <h6 class="stat-header">Purchased: <span class="badge bg-success summary-badge"><%= @purchased_items %></span></h6>
+            <h6 class="stat-header">Pending: <span class="badge bg-warning summary-badge"><%= @pending_items %></span></h6>
+            <h6 class="stat-header">Completion Rate: <span class="badge bg-info summary-badge"><%= @purchase_completion_rate %>%</span></h6>
+            
+            <% if @items_by_type.any? %>
+              <h6 class="stat-header mt-4">Items by Type:</h6>
+              <ul class="summary-list">
+                <% @items_by_type.each do |type, count| %>
+                  <li>
+                    <span><span class="badge bg-secondary"><%= type %></span></span>
+                    <span class="badge bg-light text-dark"><%= count %> items</span>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          </div>
+          
+          <div class="col-md-6">
+            <% if @most_purchased_items.any? %>
+              <h6 class="stat-header">Most Purchased Items:</h6>
+              <ol class="summary-ordered-list">
+                <% @most_purchased_items.first(5).each do |item_data| %>
+                  <li>
+                    <strong><%= item_data[:item].try(:name) || item_data[:item].try(:item_name) || "Unknown" %></strong>
+                    <span class="text-muted">- <%= item_data[:count] %> times</span>
+                  </li>
+                <% end %>
+              </ol>
+            <% else %>
+              <div class="empty-state">
+                <p class="text-muted">No purchase history yet</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

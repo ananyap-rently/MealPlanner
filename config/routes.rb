@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   end
 
   # Shopping List Items
-  resources :shopping_list_items, only: [:index, :update, :destroy] do
+  resources :shopping_list_items, only: [:index, :create, :update, :destroy] do
     collection do
       delete :clear_purchased
     end
@@ -29,6 +29,12 @@ Rails.application.routes.draw do
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   root 'pages#home'
+  # Summary/Reports routes
+get 'summaries', to: 'summaries#index', as: 'summaries'
+get 'summaries/recipes', to: 'summaries#recipes', as: 'summaries_recipes'
+get 'summaries/meal_plans', to: 'summaries#meal_plans', as: 'summaries_meal_plans'
+get 'summaries/shopping', to: 'summaries#shopping', as: 'summaries_shopping'
+get 'summaries/payments', to: 'summaries#payments', as: 'summaries_payments'
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
