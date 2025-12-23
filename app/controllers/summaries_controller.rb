@@ -2,32 +2,28 @@ class SummariesController < ApplicationController
   
   
   def index
-    # This is the main summary page with all sections
+
     load_recipe_summary
     load_meal_plan_summary
     load_shopping_summary
-    # load_payment_summary
+  
   end
   
   def recipes
-    # Dedicated page for recipe summary
+    
     load_recipe_summary
   end
   
   def meal_plans
-    # Dedicated page for meal plan summary
+    
     load_meal_plan_summary
   end
   
   def shopping
-    # Dedicated page for shopping summary
+  
     load_shopping_summary
   end
   
-#   def payments
-#     # Dedicated page for payment summary
-#     load_payment_summary
-#   end
   
   private
   
@@ -100,30 +96,4 @@ class SummariesController < ApplicationController
                                     .limit(10)
                                     .includes(:purchasable)
   end
-  
-#   def load_payment_summary
-#     @total_payments = current_user.payments.count
-#     @total_amount_spent = current_user.payments.sum(:amount)
-    
-#     @payments_this_month = current_user.payments
-#                                        .where('created_at >= ?', Date.today.beginning_of_month)
-#                                        .sum(:amount)
-    
-#     @payments_this_year = current_user.payments
-#                                       .where('created_at >= ?', Date.today.beginning_of_year)
-#                                       .sum(:amount)
-    
-#     @payments_by_month = current_user.payments
-#                                      .where('created_at >= ?', 6.months.ago)
-#                                      .group("DATE_TRUNC('month', created_at)")
-#                                      .sum(:amount)
-#                                      .transform_keys { |date| date.strftime('%B %Y') }
-    
-#     @recent_payments = current_user.payments.order(created_at: :desc).limit(10)
-    
-#     @average_payment = @total_payments > 0 ? 
-#                        (@total_amount_spent / @total_payments).round(2) : 0
-    
-#     @payment_items_count = current_user.payments.joins(:shopping_list_item).count
-#   end
 end

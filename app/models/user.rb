@@ -4,4 +4,5 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :shopping_list_items,dependent: :destroy
   has_many :payments, through: :shopping_list_items
+
 end

@@ -18,21 +18,17 @@ class MealPlansController < ApplicationController
   end
 
   def show
-    # This is where the actual planning happens
+  
     @meal_plan_item = @meal_plan.meal_plan_items.new
     @recipes = Recipe.all
     @items = Item.all
     
-    # Group meal plan items by date for easy display
     @items_by_date = @meal_plan.meal_plan_items
                                 .includes(:plannable)
                                 .order(:scheduled_date, :meal_slot)
                                 .group_by(&:scheduled_date)
     
-    # Get all comments for this meal plan
-    # @comments = @meal_plan.comments.includes(:user).order(created_at: :desc)
-    # @comment = @meal_plan.comments.new
-     @comments = @meal_plan.comments.includes(:user)
+    @comments = @meal_plan.comments.includes(:user)
     @comment = Comment.new
   end
 

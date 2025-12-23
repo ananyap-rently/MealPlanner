@@ -4,16 +4,14 @@ class Payment < ApplicationRecord
 
   validates :payment_status, presence: true, inclusion: { in: %w[pending completed] }
   
-  # Scope for filtering
+
   scope :pending, -> { where(payment_status: 'pending') }
   scope :completed, -> { where(payment_status: 'completed') }
   after_update :mark_item_as_purchased, if: :saved_change_to_payment_status?
 
  
   def item_name
-    case shopping_list_item.purchasable_type
-    when "Recipe"
-      shopping_list_item.purchasable.title
+    case shopping_list_item.purchasable_type 
     when "Item"
       shopping_list_item.purchasable.item_name
     when "Ingredient"
