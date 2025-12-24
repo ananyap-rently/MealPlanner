@@ -1,4 +1,5 @@
 class MealPlansController < ApplicationController
+  before_action :authenticate_user! 
   before_action :set_meal_plan, only: [ :show, :destroy]
 
   def index

@@ -10,7 +10,7 @@
     <!-- Quick Navigation Cards -->
     <div class="row mb-4">
       <div class="col-md-3 mb-3">
-        <%= link_to summaries_recipes_path, class: "text-decoration-none" do %>
+        <%= link_to recipes_summaries_path, class: "text-decoration-none" do %>
           <div class="card summary-nav-card recipe-card text-center h-100">
             <div class="card-body">
               <h5 class="card-title text-primary">📚 Recipes</h5>
@@ -22,7 +22,7 @@
       </div>
       
       <div class="col-md-3 mb-3">
-        <%= link_to summaries_meal_plans_path, class: "text-decoration-none" do %>
+        <%= link_to meal_plans_summaries_path, class: "text-decoration-none" do %>
           <div class="card summary-nav-card mealplan-card text-center h-100">
             <div class="card-body">
               <h5 class="card-title text-success">🗓️ Meal Plans</h5>
@@ -34,7 +34,7 @@
       </div>
       
       <div class="col-md-3 mb-3">
-        <%= link_to summaries_shopping_path, class: "text-decoration-none" do %>
+        <%= link_to shopping_summaries_path, class: "text-decoration-none" do %>
           <div class="card summary-nav-card shopping-card text-center h-100">
             <div class="card-body">
               <h5 class="card-title text-warning">🛒 Shopping</h5>
@@ -45,20 +45,13 @@
         <% end %>
       </div>
       
-      <div class="col-md-3 mb-3">
-        <%= link_to summaries_payments_path, class: "text-decoration-none" do %>
-          <div class="card summary-nav-card payment-card text-center h-100">
-            
-          </div>
-        <% end %>
-      </div>
     </div>
 
     <!-- Recipe Summary Section -->
     <div class="card summary-section-card recipe-section mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0">📚 Recipe Summary</h4>
-        
+        <%= link_to "View Details →", recipes_summaries_path, class: "btn btn-sm btn-primary" %>
       </div>
       <div class="card-body">
         <div class="row">
@@ -101,7 +94,7 @@
     <div class="card summary-section-card mealplan-section mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0">🗓️ Meal Plan Summary</h4>
-      
+        <%= link_to "View Details →", meal_plans_summaries_path, class: "btn btn-sm btn-success" %>
       </div>
       <div class="card-body">
         <div class="row">
@@ -149,7 +142,7 @@
     <div class="card summary-section-card shopping-section mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0">🛒 Shopping Summary</h4>
-       
+        <%= link_to "View Details →", shopping_summaries_path, class: "btn btn-sm btn-warning" %>
       </div>
       <div class="card-body">
         <div class="row">
@@ -193,5 +186,106 @@
       </div>
     </div>
 
+    
+          
+
   </div>
 </div>
+
+<style>
+  .summaries-container {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding: 20px 0;
+  }
+  
+  .summaries-header h1 {
+    color: #2c3e50;
+    font-weight: 600;
+  }
+  
+  .btn-back {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    text-decoration: none;
+  }
+  
+  .btn-back:hover {
+    background-color: #5a6268;
+    color: white;
+  }
+  
+  .summary-nav-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .summary-nav-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  
+  .summary-section-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+  
+  .summary-section-card .card-header {
+    background-color: #fff;
+    border-bottom: 2px solid #e9ecef;
+    padding: 15px 20px;
+  }
+  
+  .stat-header {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 10px;
+  }
+  
+  .summary-badge {
+    font-size: 1rem;
+    padding: 5px 10px;
+  }
+  
+  .summary-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .summary-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .summary-ordered-list {
+    padding-left: 20px;
+  }
+  
+  .summary-ordered-list li {
+    padding: 5px 0;
+  }
+  
+  .summary-unordered-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .summary-unordered-list li {
+    padding: 5px 0;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 20px;
+  }
+</style>

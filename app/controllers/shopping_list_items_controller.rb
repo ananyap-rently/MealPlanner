@@ -1,4 +1,5 @@
 class ShoppingListItemsController < ApplicationController
+  before_action :authenticate_user! 
   before_action :set_shopping_list_item, only: [:update, :destroy]
   before_action :load_items_and_ingredients, only: [:index]
 

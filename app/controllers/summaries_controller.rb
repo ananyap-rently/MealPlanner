@@ -1,12 +1,17 @@
 class SummariesController < ApplicationController
-  
+  before_action :require_premium
   
   def index
 
     load_recipe_summary
     load_meal_plan_summary
     load_shopping_summary
-  
+      # Dashboard content only for premium users
+    @user = current_user
+    @recipes_count = current_user.recipes.count
+    @meal_plans_count = current_user.meal_plans.count
+    @comments_count = current_user.comments.count
+    
   end
   
   def recipes
