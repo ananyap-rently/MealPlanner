@@ -1,6 +1,7 @@
 require_relative "boot"
 
 require "rails/all"
+require "sprockets/railtie"
 
 
 # Require the gems listed in Gemfile, including any gems
@@ -11,6 +12,12 @@ module MealPlanner
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
+
+    config.assets.enabled = true
+    
+    # Ensure Sprockets doesn't try to take over your Javascript folder 
+    # if you want Importmaps to handle it exclusively
+    # config.assets.paths << Rails.root.join("app", "assets", "stylesheets")
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
