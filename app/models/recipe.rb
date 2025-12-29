@@ -1,7 +1,7 @@
 class Recipe < ApplicationRecord
   belongs_to :user
-  has_many :ingredients, through: :recipe_ingredients
   has_many :recipe_ingredients, dependent: :destroy
+  has_many :ingredients, through: :recipe_ingredients
   has_and_belongs_to_many :tags
   has_many :meal_plan_items, as: :plannable
   has_many :comments, as: :commentable, dependent: :destroy
@@ -12,6 +12,14 @@ class Recipe < ApplicationRecord
   attr_accessor :new_tag_name
   validates :title, presence: true
   after_save :create_tag_from_name
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["id", "title", "prep_time", "servings", "user_id", "created_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["user", "ingredients", "tags"]
+  end
 
   private
 

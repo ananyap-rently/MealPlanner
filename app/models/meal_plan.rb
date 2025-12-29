@@ -17,5 +17,13 @@ class MealPlan < ApplicationRecord
   # Generates an array of dates from start to end (usually 7 days)
   (start_date..start_date + 6.days).to_a
 end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["id", "category", "start_date", "user_id", "created_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["user", "meal_plan_items"]
+  end
 end
 

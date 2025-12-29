@@ -1,0 +1,187 @@
+/* Container for the profile card */
+.profile-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header section with Role Badge */
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #f0f2f5;
+  padding-bottom: 20px;
+  margin-bottom: 25px;
+}
+
+.profile-header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+/* Role Badges */
+.role-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.premium-role {
+  background-color: #fff4e5;
+  color: #ff9800;
+  border: 1px solid #ffe0b2;
+}
+
+.standard-role {
+  background-color: #f1f3f5;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+/* Form and Detail Groups */
+.detail-group, .form-group {
+  margin-bottom: 20px;
+}
+
+.detail-group label, .form-group label {
+  display: block;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.detail-group p {
+  font-size: 1.1rem;
+  color: #222;
+  margin: 0;
+}
+
+.bio-text {
+  line-height: 1.6;
+  color: #444;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  font-style: italic;
+}
+
+/* Inputs */
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+/* Buttons */
+.profile-actions, .form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary { background-color: #4a90e2; color: white; }
+.btn-primary:hover { background-color: #357abd; }
+
+.btn-success { background-color: #28a745; color: white; }
+.btn-success:hover { background-color: #218838; }
+
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover { background-color: #5a6268; }
+
+.btn-danger {
+  background-color: #fff;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  color: #fff;
+}
+.btn-danger:hover {
+  background-color: #dc3545;
+  
+}
+
+/* Ensure the list items align vertically */
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+}
+
+/* Style the Welcome text slightly differently */
+.user-greeting {
+  font-weight: 500;
+  color: #555;
+  margin-right: 5px;
+}
+
+/* The Profile Button "Pop" Style */
+.btn-profile {
+  background-color: #4a90e2; /* Modern blue */
+  color: white !important; /* Override link colors */
+  padding: 6px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-profile:hover {
+  background-color: #357abd;
+  transform: scale(1.05); /* Subtle grow effect */
+  box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+}
+
+/* Spacing utility if not using Bootstrap */
+.ms-2 {
+  margin-left: 0.5rem;
+}
+
+/* Danger button adjustment */
+.btn-outline-danger {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white !important;
+}

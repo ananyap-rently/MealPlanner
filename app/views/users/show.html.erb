@@ -1,0 +1,35 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>Your Profile</h1>
+    <span class="role-badge <%= @user.role %>-role">
+      <%= @user.role&.capitalize || "Standard" %> User
+    </span>
+  </div>
+
+  <div class="profile-details">
+    <div class="detail-group">
+      <label>Name</label>
+      <p><%= @user.name.presence || "No name set" %></p>
+    </div>
+
+    <div class="detail-group">
+      <label>Email</label>
+      <p><%= @user.email %></p>
+    </div>
+
+    <div class="detail-group">
+      <label>Bio</label>
+      <p class="bio-text">
+        <%= @user.bio.presence || "Click edit to add a bio about yourself!" %>
+      </p>
+    </div>
+  </div>
+
+  <div class="profile-actions">
+    <%= link_to "Edit Profile", edit_profile_path, class: "btn btn-primary" %>
+  <%= button_to "Delete Account", profile_path, 
+    method: :delete, 
+    class: "btn btn-danger", 
+    form: { data: { turbo_confirm: "Are you sure?" } } %>
+  </div>
+</div>

@@ -12,4 +12,12 @@ class MealPlanItem < ApplicationRecord
     return "Unknown" if plannable.nil?
     plannable.respond_to?(:title) ? plannable.title : plannable.item_name
   end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["id", "meal_slot", "scheduled_date", "plannable_type", "plannable_id"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["meal_plan", "plannable"]
+  end
 end

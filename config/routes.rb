@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
+  ActiveAdmin.routes(self)
+  devise_for :admin_users, ActiveAdmin::Devise.config
+  
+  
    devise_for :users
-
+  resource :profile, controller: 'users', only: [:show, :edit, :update, :destroy]
   # Role selection routes
   resource :role_selection, only: [:new, :create]
 

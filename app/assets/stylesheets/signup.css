@@ -1,0 +1,183 @@
+/* 1. Center the entire page content */
+.auth-page {
+  display: flex;
+  justify-content: center;   /* Horizontal centering */
+  align-items: center;       /* Vertical centering */
+  min-height: 80vh;          /* Takes up most of the screen height */
+  font-family: sans-serif;
+  background-color: #f4f4f4;
+}
+
+/* 2. The Card Box */
+.auth-card {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;         /* Keeps the form from getting too wide */
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* 3. Form Styling */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;    /* Ensures padding doesn't break width */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* 4. Error Styling */
+.error-box {
+  background: #fff0f0;
+  color: #d8000c;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #d8000c;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* 5. Button and Footer */
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 20px;
+}
+/* Centering the entire wrapper */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 85vh; /* Centers vertically in the viewport */
+  background-color: #f9f9f9;
+  padding: 20px;
+}
+
+/* The Card box */
+.auth-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 450px; /* Limits width on desktop */
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.auth-title {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 24px;
+  color: #333;
+}
+
+.auth-subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+/* Form Styles */
+.field-group {
+  margin-bottom: 20px;
+}
+
+.field-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #444;
+}
+
+.field-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box; /* Crucial for width alignment */
+}
+
+/* Checkbox Alignment */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+/* Submit Button */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-submit:hover {
+  background-color: #0056b3;
+}
+
+/* Error Messages */
+.error-banner {
+  background-color: #fff5f5;
+  color: #c53030;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #feb2b2;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Footer & Links */
+.divider {
+  margin: 25px 0;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+.auth-footer, .auth-links {
+  text-align: center;
+  font-size: 14px;
+}
+
+.link-bold {
+  font-weight: bold;
+  text-decoration: none;
+  color: #007bff;
+}

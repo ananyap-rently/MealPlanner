@@ -35,8 +35,10 @@
       <%= link_to "Plan", meal_plans_path, class: "nav-link" %>
       <%= link_to "Shop", shopping_list_items_path, class: "nav-link" %>
        <%= link_to "Payment", payments_path, class: "nav-link" %>
-       <%= link_to "📊 Dashboard", summaries_path, class: "nav-link" %>
-    </div>
+       <% if user_signed_in? && current_user.premium? %>
+      <%= link_to "📊 Dashboard", summaries_path, class: "nav-link" %>
+      <% end %>
+      </div>
     <div class="navbar-right">
    <ul class="navbar-nav">
         <% if user_signed_in? %>
@@ -48,6 +50,9 @@
               <% end %>
             </span>
           </li>
+          <li class="nav-item">
+        <%= link_to "My Profile", profile_path, class: "btn btn-profile ms-2" %>
+      </li>
           <li class="nav-item">
             <%= link_to "Logout", 
                 destroy_user_session_path, 
@@ -66,6 +71,16 @@
 
     
   </nav>
+  <div class="container mt-3">
+  <% flash.each do |type, message| %>
+    <%# Map Rails alert/notice to Bootstrap classes %>
+    <% alert_class = type == 'notice' ? 'success' : 'danger' %>
+    <div class="alert alert-<%= alert_class %> alert-dismissible fade show" role="alert">
+      <%= message %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% end %>
+</div>
     <%= yield %>
   </body>
 </html>

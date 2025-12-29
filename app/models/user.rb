@@ -11,7 +11,12 @@ class User < ApplicationRecord
 
   # Role validation (since role is a string, NOT integer)
   validates :role, inclusion: { in: %w[standard premium], allow_nil: true }
-  validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :email, 
+            presence: true, 
+            format: { 
+              with: URI::MailTo::EMAIL_REGEXP, 
+              message: "is not a valid email format" 
+            }
   # Check if user is premium
   def premium?
     role == 'premium'
@@ -19,5 +24,15 @@ class User < ApplicationRecord
   
   def standard?
     role == 'standard'
+  end
+
+  # This tells Ransack which columns are safe to search/filter
+  def self.ransackable_attributes(auth_object = nil)
+    ["id", "name", "email", "role", "bio", "created_at"]
+  end
+
+  # This tells Ransack which associations (if any) are safe to search
+  def self.ransackable_associations(auth_object = nil)
+    [] # Add association names here if you want to search by things like 'posts'
   end
 end

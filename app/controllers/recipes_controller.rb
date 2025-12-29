@@ -1,7 +1,7 @@
 class RecipesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
   before_action :set_recipe, only: [:show, :edit, :update, :destroy]
-
+  before_action :authorize_user!, only: [:edit, :update, :destroy]
   def index
     @recipes = Recipe.all
   end
@@ -54,5 +54,11 @@ class RecipesController < ApplicationController
 
   def set_recipe
     @recipe = Recipe.find(params[:id])
+  end
+
+  def authorize_user!
+    if @recipe.user != current_user
+      redirect_to recipes_path, alert: "You are not authorized to perform this action"
+    end
   end
 end

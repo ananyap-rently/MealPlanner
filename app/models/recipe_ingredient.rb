@@ -8,6 +8,17 @@ class RecipeIngredient < ApplicationRecord
   validates :ingredient, presence: true
   validates :quantity, presence: {message: "can't be blank! "}
   validates :unit, presence: {message: "can't be blank" }
+
+  def self.ransackable_attributes(auth_object = nil)
+    # List the columns you want to be able to search by in the sidebar
+    ["id", "quantity", "unit", "recipe_id", "ingredient_id", "created_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["ingredient", "recipe"]
+  end
+
+  
   private
 
   def create_ingredient_from_name
