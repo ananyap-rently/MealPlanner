@@ -31,7 +31,11 @@ ActiveAdmin.register MealPlanItem do
     end
     column :scheduled_date
     column :meal_slot
-    column :plannable
+    column "Plannable Type", :plannable
+    column "Name" do |item|
+      # Display title for recipes or item_name for items
+      item.plannable.try(:title) || item.plannable.try(:item_name)
+    end
     actions
   end
   form do |f|
@@ -41,8 +45,9 @@ ActiveAdmin.register MealPlanItem do
       f.input :meal_slot, as: :select, collection: ["Breakfast", "Lunch", "Dinner", "Snack"]
       
       # Polymorphic handling
-      f.input :plannable_type, as: :select, collection: ["Recipe"] 
-      f.input :plannable_id, as: :select, collection: Recipe.all.map { |r| [r.title, r.id] }, label: "Recipe"
+      f.input :plannable_type, as: :select, collection: ["Recipe", "Item"] 
+      f.input :plannable_id, as: :select, collection: (Recipe.all.map { |r| [r.title, r.id] } + 
+                           Item.all.map { |i| [i.item_name, i.id] }), label: "Recipe or Item"
     end
     f.actions
   end

@@ -46,7 +46,7 @@ redirect_to @meal_plan,
 
     case mpi.plannable
     when Recipe
-      result = add_recipe_ingredients_to_shopping_list(mpi.plannable)
+      result = add_recipe_ingredients_to_shopping_list(mpi.plannable, @meal_plan)
       added_count += result[:added]
       merged_count += result[:merged]
 
@@ -62,14 +62,15 @@ redirect_to @meal_plan,
         new_qty = (mpi.plannable.quantity || "1").to_f
         merged_qty = existing_qty + new_qty
         
-        existing_item.update(quantity: merged_qty.to_s)
+        existing_item.update(quantity: merged_qty.to_s, meal_plan_id: @meal_plan.id)
         merged_count += 1
       else
         # Create new item
         current_user.shopping_list_items.create!(
           purchasable: mpi.plannable,
           quantity: mpi.plannable.quantity || "1",
-          is_purchased: false
+          is_purchased: false,
+          meal_plan_id: @meal_plan.id
         )
         added_count += 1
       end
@@ -89,7 +90,7 @@ end
   # for adding ingredients
   private
 
-def add_recipe_ingredients_to_shopping_list(recipe)
+def add_recipe_ingredients_to_shopping_list(recipe,meal_plan)
   added = 0
   merged = 0
   
@@ -106,14 +107,17 @@ def add_recipe_ingredients_to_shopping_list(recipe)
       merged_qty = existing_qty + new_qty
       
       # Update with merged quantity and keep the unit
-      existing_item.update(quantity: "#{merged_qty} #{ri.unit}")
+      existing_item.update(quantity: "#{merged_qty} #{ri.unit}",
+      meal_plan_id: meal_plan.id
+      )
       merged += 1
     else
       # Create new item if it doesn't exist
       current_user.shopping_list_items.create!(
         purchasable: ri.ingredient,
         quantity: "#{ri.quantity} #{ri.unit}",
-        is_purchased: false
+        is_purchased: false,
+        meal_plan_id: meal_plan.id
       )
       added += 1
     end

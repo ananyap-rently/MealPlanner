@@ -46,10 +46,11 @@ ActiveAdmin.register Recipe do
     column :servings
     column :ingredients do |recipe|
       recipe.ingredients.map(&:name).join(", ")
+      link_to "View Quantities", admin_recipe_ingredients_path('q[recipe_id_eq]' => recipe.id)
     end
-    # column :tags do |recipe|
-    #   recipe.tags.map(&:name).join(", ")
-    # end
+    column :tags do |recipe|
+      recipe.tags.map(&:tag_name).join(", ")
+    end
     actions
   end
 

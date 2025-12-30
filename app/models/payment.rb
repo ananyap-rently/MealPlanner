@@ -10,6 +10,13 @@ class Payment < ApplicationRecord
   after_update :mark_item_as_purchased, if: :saved_change_to_payment_status?
 
  
+  def self.ransackable_attributes(auth_object = nil)
+    ["id","shopping_list_item_id", "payment_status"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["shopping_list_item"]
+  end
   def item_name
     case shopping_list_item.purchasable_type 
     when "Item"

@@ -23,7 +23,7 @@ end
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ["user", "meal_plan_items"]
+    ["user", "meal_plan_items","shopping_list_items"]
   end
 end
 
