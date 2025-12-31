@@ -38,7 +38,9 @@ class RecipesController < ApplicationController
     @recipe.destroy
     redirect_to recipes_path, notice: "Recipe deleted", status: :see_other
   end
-    private
+
+
+  private
 
   def recipe_params
     params.require(:recipe).permit(

@@ -3,13 +3,18 @@
     <div class="auth-body">
       <h2 class="auth-title">Sign In</h2>
       <p class="auth-subtitle">Welcome back! Please login to your account</p>
-      
+      <% if flash[:alert] %>
+        <div class="alert alert-danger" data-turbo-cache="false">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
      
 
-      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "auth-form" }) do |f| %>
+     <%= form_with(model: resource, scope: resource_name, url: session_path(resource_name), class: "auth-form", data: { turbo: false }) do |f| %>
         <div class="field-group">
           <%= f.label :email %>
-          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "Enter your email" %>
+          <%= f.text_field :email, autofocus: true, autocomplete: "email", placeholder: "Enter your email" %>
         </div>
 
         <div class="field-group">

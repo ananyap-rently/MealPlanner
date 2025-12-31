@@ -1,21 +1,44 @@
-
-<div class="container">
+<div class="container" data-controller="search">
   <div class="header">
     <h1>My Recipes</h1>
     <%= link_to "Create New Recipe", new_recipe_path, class: "btn btn-primary" %>
   </div>
 
   <% if @recipes.any? %>
+    <!-- Search Box -->
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input 
+          type="text" 
+          placeholder="Search recipes by title or tags..." 
+          class="search-input"
+          data-search-target="input"
+          data-action="input->search#filter"
+        >
+        <button 
+          type="button" 
+          class="clear-btn"
+          data-action="click->search#clear"
+          title="Clear search"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+
     <div class="recipes-grid">
       <% @recipes.each do |recipe| %>
-        <div class="recipe-card">
+        <div 
+          class="recipe-card" 
+          data-search-target="card"
+          data-title="<%= recipe.title %>"
+          data-tags="<%= recipe.tags.map(&:tag_name).join(' ') %>"
+        >
           <h2><%= link_to recipe.title, recipe_path(recipe) %></h2>
-          
           <div class="recipe-meta">
             <p><strong>Prep Time:</strong> <%= recipe.prep_time %> mins</p>
             <p><strong>Servings:</strong> <%= recipe.servings %></p>
           </div>
-
           <% if recipe.tags.any? %>
             <div class="tags">
               <% recipe.tags.each do |tag| %>
@@ -23,7 +46,6 @@
               <% end %>
             </div>
           <% end %>
-
           <div class="recipe-actions">
             <%= link_to "View", recipe_path(recipe), class: "btn btn-view" %>
             <%= link_to "Edit", edit_recipe_path(recipe), class: "btn btn-edit" %>
@@ -64,6 +86,49 @@
     margin: 0;
   }
 
+  
+  .search-container {
+    margin-bottom: 30px;
+  }
+
+  .search-wrapper {
+    position: relative;
+    max-width: 500px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: color 0.3s ease;
+  }
+
+  .clear-btn:hover {
+    color: #333;
+  }
+
+  
   .btn {
     padding: 10px 20px;
     text-decoration: none;
@@ -98,6 +163,7 @@
     color: white;
   }
 
+  
   .recipes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -109,6 +175,12 @@
     border-radius: 8px;
     padding: 20px;
     background-color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .recipe-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   }
 
   .recipe-card h2 {
@@ -157,6 +229,7 @@
     border-top: 1px solid #eee;
   }
 
+  
   .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -168,5 +241,9 @@
     font-size: 18px;
     color: #666;
     margin-bottom: 20px;
+  }
+
+  #no-results {
+    margin-top: 20px;
   }
 </style>

@@ -5,7 +5,7 @@ ActiveAdmin.register User do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :name, :email, :role, :bio, :reset_password_sent_at, :remember_created_at
+   permit_params :name, :email, :role, :bio, :reset_password_sent_at, :remember_created_at,:password, :password_confirmation
   #
   # or
   #
@@ -37,7 +37,7 @@ ActiveAdmin.register User do
     f.inputs "User Details" do
       f.input :name
       f.input :email
-      f.input :role, as: :select, collection: ["user", "manager"] # Example roles
+      f.input :role, as: :select, collection: ["standard", "premium"] # Example roles
       f.input :bio
       
       # Only show password fields if it's a new user 

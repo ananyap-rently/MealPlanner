@@ -9,14 +9,11 @@ class User < ApplicationRecord
   has_many :shopping_list_items,dependent: :destroy
   has_many :payments, through: :shopping_list_items
 
+  # Add name validation
+  validates :name, presence: true
   # Role validation (since role is a string, NOT integer)
   validates :role, inclusion: { in: %w[standard premium], allow_nil: true }
-  validates :email, 
-            presence: true, 
-            format: { 
-              with: URI::MailTo::EMAIL_REGEXP, 
-              message: "is not a valid email format" 
-            }
+  
   # Check if user is premium
   def premium?
     role == 'premium'
