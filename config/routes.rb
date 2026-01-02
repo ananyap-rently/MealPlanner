@@ -13,6 +13,15 @@ Rails.application.routes.draw do
     resources :comments, only: [:create, :destroy]
   end
 
+  namespace :api do
+    namespace :v1 do
+      resources :recipes, only: [:index, :show, :create, :update, :destroy]
+      # Add other API resources as needed
+      # resources :comments, only: [:create, :destroy]
+    end
+  end
+
+  
   # Meal Plans routes
   resources :meal_plans do
     resources :meal_plan_items, only: [:create, :destroy] do

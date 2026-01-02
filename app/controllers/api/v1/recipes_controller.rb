@@ -1,0 +1,75 @@
+# app/controllers/api/v1/recipes_controller.rb
+module Api
+  module V1
+    class RecipesController < BaseController
+      skip_before_action :authenticate_user!, only: [:index, :show]
+      before_action :set_recipe, only: [:show, :update, :destroy]
+      before_action :authorize_user!, only: [:update, :destroy]
+
+      # GET /api/v1/recipes
+      def index
+        @recipes = Recipe.includes(:user, :tags, :ingredients)
+        render json: @recipes, include: [:user, :tags, :ingredients]
+      end
+
+      # GET /api/v1/recipes/:id
+      def show
+        render json: @recipe, include: [:user, :tags, :ingredients, comments: :user]
+      end
+
+      # POST /api/v1/recipes
+      def create
+        @recipe = current_user.recipes.build(recipe_params)
+        
+        if @recipe.save
+          render json: @recipe, status: :created, location: api_v1_recipe_url(@recipe)
+        else
+          render json: { errors: @recipe.errors.full_messages }, 
+                 status: :unprocessable_entity
+        end
+      end
+
+      # PATCH/PUT /api/v1/recipes/:id
+      def update
+        if @recipe.update(recipe_params)
+          render json: @recipe
+        else
+          render json: { errors: @recipe.errors.full_messages }, 
+                 status: :unprocessable_entity
+        end
+      end
+
+      # DELETE /api/v1/recipes/:id
+      def destroy
+        @recipe.destroy
+        head :no_content
+      end
+
+      private
+
+      def recipe_params
+        params.require(:recipe).permit(
+          :title, 
+          :instructions, 
+          :prep_time, 
+          :servings, 
+          :new_tag_name,
+          tag_ids: [], 
+          recipe_ingredients_attributes: [
+            :id, :ingredient_id, :quantity, :unit, :_destroy, :new_ingredient_name
+          ]
+        )
+      end
+
+      def set_recipe
+        @recipe = Recipe.find(params[:id])
+      end
+
+      def authorize_user!
+        unless @recipe.user == current_user
+          render json: { error: "Not authorized" }, status: :forbidden
+        end
+      end
+    end
+  end
+end
