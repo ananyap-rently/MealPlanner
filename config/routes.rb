@@ -15,16 +15,45 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :recipes, only: [:index, :show, :create, :update, :destroy]
+      resources :comments, only: [ :destroy]
+      resources :recipes, only: [:index, :show, :create, :update, :destroy] do
+        resources :comments, only: [:index, :create]
+      end
+      resource :profile, controller: 'users', only: [:show, :update, :destroy]
+      resources :shopping_list_items do
+      collection do
+        delete :clear_purchased
+      end
+    end
+    resources :payments, only: [:index, :create, :update, :destroy] do
+      collection do
+        delete :clear_completed
+      end
+    end
+    resources :meal_plans do
+      resources :comments, only: [:index, :create]
+      resources :meal_plan_items, only: [:create, :destroy] do
+        collection do
+          post :add_to_shopping_list
+        end
+      end
+    end
+    resources :summaries, only: [:index] do
+      collection do
+        get :recipes
+        get :meal_plans
+        get :shopping
+      end
+    end
       # Add other API resources as needed
       # resources :comments, only: [:create, :destroy]
     end
-  end
 
+  end
   
   # Meal Plans routes
   resources :meal_plans do
-    resources :meal_plan_items, only: [:create, :destroy] do
+    resources :meal_plan_items, only: [:index, :create, :destroy] do
       collection do
         post :add_to_shopping_list
       end
