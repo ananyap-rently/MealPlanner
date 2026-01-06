@@ -17,7 +17,7 @@ ActiveAdmin.register ShoppingListItem do
   filter :user
   filter :purchasable_type, as: :select, collection: ["Item", "Ingredient"]
   filter :is_purchased
-  filter :meal_plan
+  # filter :meal_plan
   filter :created_at
   index do
     selectable_column

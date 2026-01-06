@@ -14,8 +14,13 @@ module Api
 
       # GET /api/v1/recipes/:id
       def show
-        render json: @recipe, include: [:user, :tags, :ingredients, comments: :user]
-      end
+      render json: @recipe, include: [
+    :user, 
+    :tags, 
+    :ingredients, 
+    { comments: { include: :user } }
+  ]
+end
 
       # POST /api/v1/recipes
       def create

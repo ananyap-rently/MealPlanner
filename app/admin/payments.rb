@@ -16,8 +16,20 @@ ActiveAdmin.register Payment do
   #   permitted
   # end
   filter :shopping_list_item_id
-  filter :payment_status
+ filter :payment_status, as: :select, collection: ["Pending", "Completed"]
   
+ # 1. Batch Action to mark as Completed
+  batch_action :mark_as_completed, confirm: "Mark selected payments as Completed?" do |ids|
+    Payment.where(id: ids).update_all(payment_status: "Completed")
+    redirect_to collection_path, notice: "Selected payments marked as Completed."
+  end
+
+  # 2. Batch Action to mark as Pending
+  batch_action :mark_as_pending, confirm: "Mark selected payments as Pending?" do |ids|
+    Payment.where(id: ids).update_all(payment_status: "Pending")
+    redirect_to collection_path, notice: "Selected payments marked as Pending."
+  end
+
   index do
     selectable_column
     id_column
@@ -29,12 +41,12 @@ ActiveAdmin.register Payment do
       end
     end
     column :payment_status
-    actions
+     actions
   end
 
   form do |f|
     f.input :shopping_list_item_id
-    f.input :payment_status
+    f.input :payment_status, as: :select, collection: ["Pending", "Completed"]
   
   f.actions
 end

@@ -1,138 +1,46 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow">
-        <div class="card-body p-5">
-          <h2 class="text-center mb-4">Choose Your Account Type</h2>
-          <p class="text-center text-muted mb-5">
-            Select the type of account that best suits your needs
-          </p>
+<div class="role-selection-wrapper">
+  <div class="card shadow p-5" style="width: 100%; max-width: 1000px;">
+    <h2 class="text-center mb-4">Choose Your Account Type</h2>
+    <p class="text-center text-muted mb-5">Select the type of account that best suits your needs</p>
 
-          <%= form_with url: role_selection_path, method: :post, local: true do |f| %>
-            <div class="row">
-              <!-- Standard User Card -->
-              <div class="col-md-6 mb-4">
-                <label for="role_standard" class="card-label">
-                  <div class="card h-100 role-card">
-                    <div class="card-body text-center">
-                      <div class="mb-3">
-                        <span class="user-icon">👤</span>
-                      </div>
-                      <h4 class="card-title">Standard User</h4>
-                      <p class="card-text text-muted mb-4">
-                        Perfect for casual users who want basic access
-                      </p>
-                      <ul class="list-unstyled text-start">
-                        <li class="mb-2">✓ Browse recipes</li>
-                        <li class="mb-2">✓ Create meal plans</li>
-                        <li class="mb-2">✓ Add comments</li>
-                        <li class="mb-2">✓ Shopping lists</li>
-                        <li class="mb-2 text-muted">✗ Dashboard access</li>
-                      </ul>
-                      <%= f.radio_button :role, 'standard', id: 'role_standard' %>
-                      <span class="select-btn btn btn-outline-primary w-100 mt-3">
-                        Select Standard
-                      </span>
-                    </div>
-                  </div>
-                </label>
-              </div>
+    <%= form_with url: role_selection_path, method: :post, local: true do |f| %>
+      <div class="role-container">
+        
+        <label class="card-label">
+          <%= f.radio_button :role, 'standard', id: 'role_standard' %>
+          <div class="role-card card-body text-center">
+            <span class="user-icon">👤</span>
+            <h4 class="card-title">Standard User</h4>
+            <p class="text-muted small">Perfect for casual users</p>
+            <ul class="list-unstyled text-start mb-4">
+              <li>✓ Browse recipes</li>
+              <li>✓ Create meal plans</li>
+              <li>✓ Shopping lists</li>
+            </ul>
+            <div class="select-btn btn btn-outline-primary w-100">Select Standard</div>
+          </div>
+        </label>
 
-              <!-- Premium User Card -->
-              <div class="col-md-6 mb-4">
-                <label for="role_premium" class="card-label">
-                  <div class="card h-100 role-card border-warning">
-                    <div class="card-body text-center">
-                      <div class="mb-3">
-                        <span class="crown-icon">👑</span>
-                      </div>
-                      <h4 class="card-title">Premium User</h4>
-                      <span class="badge bg-warning text-dark mb-3">Recommended</span>
-                      <p class="card-text text-muted mb-4">
-                        Full access to all features and analytics
-                      </p>
-                      <ul class="list-unstyled text-start">
-                        <li class="mb-2">✓ All standard features</li>
-                        <li class="mb-2">✓ Dashboard access</li>
-                        <li class="mb-2">✓ Analytics & insights</li>
-                        <li class="mb-2">✓ Priority support</li>
-                        <li class="mb-2">✓ Advanced features</li>
-                      </ul>
-                      <%= f.radio_button :role, 'premium', id: 'role_premium' %>
-                      <span class="select-btn btn btn-warning w-100 mt-3">
-                        Select Premium
-                      </span>
-                    </div>
-                  </div>
-                </label>
-              </div>
-            </div>
+        <label class="card-label">
+          <%= f.radio_button :role, 'premium', id: 'role_premium' %>
+          <div class="role-card card-body text-center border-warning">
+            <span class="crown-icon">👑</span>
+            <h4 class="card-title">Premium User</h4>
+            <span class="badge bg-warning text-dark mb-3">Recommended</span>
+            <ul class="list-unstyled text-start mb-4">
+              <li>✓ All standard features</li>
+              <li>✓ Dashboard access</li>
+              <li>✓ Priority support</li>
+            </ul>
+            <div class="select-btn btn btn-warning w-100">Select Premium</div>
+          </div>
+        </label>
 
-            <div class="text-center mt-4">
-              <%= f.submit "Continue", class: "btn btn-lg btn-primary px-5" %>
-            </div>
-          <% end %>
-        </div>
       </div>
-    </div>
+
+      <div class="text-center mt-5">
+        <%= f.submit "Continue", class: "btn btn-lg btn-primary px-5" %>
+      </div>
+    <% end %>
   </div>
 </div>
-
-<style>
-  .card-label {
-    cursor: pointer;
-    display: block;
-  }
-  
-  .role-card {
-    transition: transform 0.3s, box-shadow 0.3s;
-    position: relative;
-  }
-  
-  .role-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-  }
-  
-  input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  input[type="radio"]:checked + .select-btn {
-    background-color: #0d6efd;
-    color: white;
-    border-color: #0d6efd;
-  }
-  
-  input[type="radio"]:checked ~ .card-body .select-btn {
-    background-color: #0d6efd;
-    color: white;
-  }
-  
-  #role_premium:checked + .select-btn {
-    background-color: #ffc107;
-    color: #000;
-    border-color: #ffc107;
-  }
-  
-  input[type="radio"]:checked ~ * {
-    outline: 2px solid #0d6efd;
-    outline-offset: 2px;
-  }
-  
-  #role_premium:checked ~ * {
-    outline-color: #ffc107;
-  }
-  
-  .user-icon, .crown-icon {
-    font-size: 3rem;
-    display: inline-block;
-  }
-  
-  .select-btn {
-    pointer-events: none;
-  }
-</style>

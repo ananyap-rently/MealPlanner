@@ -1,0 +1,83 @@
+/* Container and Layout */
+.role-selection-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh; /* Centers vertically in the viewport */
+  padding: 20px;
+}
+
+.role-container {
+  display: flex;
+  gap: 30px; /* This creates the space between the two cards */
+  justify-content: center;
+  flex-wrap: wrap; /* Ensures responsiveness on mobile */
+  width: 100%;
+  max-width: 900px;
+}
+
+/* Card Styling */
+.card-label {
+  cursor: pointer;
+  flex: 1;
+  min-width: 300px; /* Prevents cards from getting too skinny */
+  max-width: 400px;
+}
+
+.role-card {
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  background: #fff;
+  height: 100%;
+}
+
+.role-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+/* Hide the actual radio input */
+input[type="radio"] {
+  display: none;
+}
+
+/* Icon Styling */
+.user-icon, .crown-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 15px;
+}
+
+/* Logic for Selected State */
+/* Standard Checked */
+#role_standard:checked ~ .select-btn {
+  background-color: #0d6efd;
+  color: white;
+}
+
+#role_standard:checked + .role-card {
+  border: 2px solid #0d6efd;
+  box-shadow: 0 0 15px rgba(13, 110, 253, 0.2);
+}
+
+/* Premium Checked */
+#role_premium:checked ~ .select-btn {
+  background-color: #ffc107;
+  color: #000;
+}
+
+#role_premium:checked + .role-card {
+  border: 2px solid #ffc107;
+  box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+}
+
+.select-btn {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  pointer-events: none; /* Label handles the click */
+}
