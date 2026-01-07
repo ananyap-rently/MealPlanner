@@ -1,229 +1,258 @@
-<div class="container">
+<div class="container" 
+     data-controller="recipe-form ingredients"
+     data-recipe-form-mode-value="<%= @recipe.new_record? ? 'new' : 'edit' %>"
+     data-recipe-form-recipe-id-value="<%= @recipe.id unless @recipe.new_record? %>">
+  
   <div class="form-header">
     <h1><%= @recipe.new_record? ? "Create New Recipe" : "Edit Recipe" %></h1>
   </div>
 
-  <%= form_with(model: @recipe, local: true) do |f| %>
-    <% if @recipe.errors.any? %>
-      <div class="error-messages">
-        <h3><%= pluralize(@recipe.errors.count, "error") %> prohibited this recipe from being saved:</h3>
-        <ul>
-          <% @recipe.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+  <!-- Error messages container -->
+  <div data-recipe-form-target="errors"></div>
 
+  <form data-recipe-form-target="form" data-action="submit->recipe-form#submit">
     <!-- Basic Recipe Details Section -->
     <div class="form-section">
       <h2>Basic Details</h2>
       
       <div class="form-group">
-        <%= f.label :title, "Recipe Title" %>
-        <%= f.text_field :title, class: "form-control", placeholder: "e.g., Chocolate Chip Cookies" %>
+        <label for="recipe_title">Recipe Title</label>
+        <input type="text" 
+               id="recipe_title"
+               name="recipe[title]" 
+               class="form-control" 
+               placeholder="e.g., Chocolate Chip Cookies"
+               required>
       </div>
 
       <div class="form-group">
-        <%= f.label :instructions, "Cooking Instructions" %>
-        <%= f.text_area :instructions, rows: 8, class: "form-control", placeholder: "Describe step by step how to prepare this recipe..." %>
+        <label for="recipe_instructions">Cooking Instructions</label>
+        <textarea id="recipe_instructions"
+                  name="recipe[instructions]" 
+                  rows="8" 
+                  class="form-control" 
+                  placeholder="Describe step by step how to prepare this recipe..."
+                  required></textarea>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <%= f.label :prep_time, "Preparation Time (minutes)" %>
-          <%= f.number_field :prep_time, class: "form-control", placeholder: "30", min: 0 %>
+          <label for="recipe_prep_time">Preparation Time (minutes)</label>
+          <input type="number" 
+                 id="recipe_prep_time"
+                 name="recipe[prep_time]" 
+                 class="form-control" 
+                 placeholder="30" 
+                 min="0"
+                 required>
         </div>
 
         <div class="form-group">
-          <%= f.label :servings, "Number of Servings" %>
-          <%= f.number_field :servings, class: "form-control", placeholder: "4", min: 1 %>
+          <label for="recipe_servings">Number of Servings</label>
+          <input type="number" 
+                 id="recipe_servings"
+                 name="recipe[servings]" 
+                 class="form-control" 
+                 placeholder="4" 
+                 min="1"
+                 required>
         </div>
       </div>
     </div>
 
-  <!-- Ingredients Section -->
-<div class="form-section" data-controller="ingredients">
-  <h2>Ingredients</h2>
+    <!-- Ingredients Section -->
+    <div class="form-section">
+      <h2>Ingredients</h2>
 
-  <!-- Dropdown with button to add -->
-  <div class="form-group">
-    <label>Select Ingredients from Database</label>
-    <div style="display: flex; gap: 10px; align-items: flex-start;">
-      <select class="form-control"
-              data-ingredients-target="select"
-              style="flex: 1;">
-        <option value="">-- Choose an ingredient --</option>
-        <% Ingredient.all.order(:name).each do |ingredient| %>
-          <option value="<%= ingredient.id %>"><%= ingredient.name %></option>
-        <% end %>
-      </select>
-      <button type="button"
-              class="btn btn-primary"
-              data-action="click->ingredients#add"
-              style="white-space: nowrap;">
-        Add Selected
-      </button>
-    </div>
-    <small class="help-text">Select an ingredient from the dropdown and click "Add Selected"</small>
-  </div>
+      <!-- Dropdown with button to add -->
+      <div class="form-group">
+        <label>Select Ingredients from Database</label>
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <select class="form-control"
+                  data-ingredients-target="select"
+                  style="flex: 1;">
+            <option value="">-- Choose an ingredient --</option>
+            <% Ingredient.all.order(:name).each do |ingredient| %>
+              <option value="<%= ingredient.id %>"><%= ingredient.name %></option>
+            <% end %>
+          </select>
+          <button type="button"
+                  class="btn btn-primary"
+                  data-action="click->ingredients#add"
+                  style="white-space: nowrap;">
+            Add Selected
+          </button>
+        </div>
+        <small class="help-text">Select an ingredient from the dropdown and click "Add Selected"</small>
+      </div>
 
-  <!-- Selected ingredients list -->
-  <div style="margin: 25px 0;">
-    <h3 style="font-size: 1.1em; margin-bottom: 15px; color: #2c3e50;">Selected Ingredients:</h3>
-    <div data-ingredients-target="list" style="min-height: 50px; padding: 10px; background: #f8f9fa; border-radius: 4px; border: 1px dashed #dee2e6;">
-      
-      <!-- Show existing ingredients when editing -->
-      <% if @recipe.recipe_ingredients.any? %>
-        <% @recipe.recipe_ingredients.each_with_index do |recipe_ingredient, index| %>
-          <div class="ingredient-row" style="padding: 15px; margin-bottom: 12px; border: 1px solid #dee2e6; border-radius: 6px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            <%= f.fields_for :recipe_ingredients, recipe_ingredient do |ri| %>
-              <%= ri.hidden_field :id %>
-              <%= ri.hidden_field :ingredient_id %>
-              <%= ri.hidden_field :_destroy, value: false, class: "destroy-field" %>
+      <!-- Selected ingredients list -->
+      <div style="margin: 25px 0;">
+        <h3 style="font-size: 1.1em; margin-bottom: 15px; color: #2c3e50;">Selected Ingredients:</h3>
+        <div data-ingredients-target="list" 
+             style="min-height: 50px; padding: 10px; background: #f8f9fa; border-radius: 4px; border: 1px dashed #dee2e6;">
+          
+          <!-- Show existing ingredients when editing -->
+          <% if @recipe.recipe_ingredients.any? %>
+            <% @recipe.recipe_ingredients.each_with_index do |recipe_ingredient, index| %>
+              <div class="ingredient-row" style="padding: 15px; margin-bottom: 12px; border: 1px solid #dee2e6; border-radius: 6px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <input type="hidden" name="recipe[recipe_ingredients_attributes][][id]" value="<%= recipe_ingredient.id %>">
+                <input type="hidden" name="recipe[recipe_ingredients_attributes][][ingredient_id]" value="<%= recipe_ingredient.ingredient_id %>">
+                <input type="hidden" name="recipe[recipe_ingredients_attributes][][_destroy]" value="false" class="destroy-field">
 
-              <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr auto; gap: 15px; align-items: center;">
-                <!-- Ingredient name -->
-                <div>
-                  <strong style="color: #2c3e50; font-size: 1.05em;"><%= recipe_ingredient.ingredient.name %></strong>
-                </div>
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr auto; gap: 15px; align-items: center;">
+                  <!-- Ingredient name -->
+                  <div>
+                    <strong style="color: #2c3e50; font-size: 1.05em;"><%= recipe_ingredient.ingredient.name %></strong>
+                  </div>
 
-                <!-- Quantity input -->
-                <div>
-                  <%= ri.text_field :quantity, class: "form-control", placeholder: "e.g., 2, 500", required: true %>
-                  <small class="help-text" style="font-size: 0.85em;">Quantity *</small>
-                </div>
+                  <!-- Quantity input -->
+                  <div>
+                    <input type="text" 
+                           name="recipe[recipe_ingredients_attributes][][quantity]" 
+                           class="form-control" 
+                           placeholder="e.g., 2, 500" 
+                           value="<%= recipe_ingredient.quantity %>"
+                           required>
+                    <small class="help-text" style="font-size: 0.85em;">Quantity *</small>
+                  </div>
 
-                <!-- Unit input -->
-                <div>
-                  <%= ri.select :unit, 
-                      options_for_select(
-                        ['cups', 'tbsp', 'tsp', 'g', 'kg', 'ml', 'l', 'oz', 'lb', 'pieces', 'pinch'], 
-                        recipe_ingredient.unit
-                      ), 
-                      { prompt: 'Select unit' }, 
-                      { class: "form-control", required: true } %>
-                  <small class="help-text" style="font-size: 0.85em;">Unit *</small>
-                </div>
+                  <!-- Unit input -->
+                  <div>
+                    <select name="recipe[recipe_ingredients_attributes][][unit]" 
+                            class="form-control" 
+                            required>
+                      <option value="">Select unit</option>
+                      <% ['cups', 'tbsp', 'tsp', 'g', 'kg', 'ml', 'l', 'oz', 'lb', 'pieces', 'pinch'].each do |unit| %>
+                        <option value="<%= unit %>" <%= 'selected' if recipe_ingredient.unit == unit %>><%= unit %></option>
+                      <% end %>
+                    </select>
+                    <small class="help-text" style="font-size: 0.85em;">Unit *</small>
+                  </div>
 
-                <!-- Remove button -->
-                <div>
-                  <button type="button"
-                          class="btn btn-sm btn-danger"
-                          data-action="click->ingredients#removeExisting">
-                    ✕ Remove
-                  </button>
+                  <!-- Remove button -->
+                  <div>
+                    <button type="button"
+                            class="btn btn-sm btn-danger"
+                            data-action="click->ingredients#removeExisting">
+                      ✕ Remove
+                    </button>
+                  </div>
                 </div>
               </div>
             <% end %>
-          </div>
-        <% end %>
-      <% else %>
-        <p style="color: #6c757d; margin: 0; font-style: italic;">No ingredients added yet. Select from dropdown or add new below.</p>
-      <% end %>
-    </div>
-  </div>
-
-  <!-- Add new ingredient -->
-  <div class="form-group">
-    <label>Or Add New Ingredient (not in database)</label>
-    <div style="display: flex; gap: 10px; align-items: flex-start;">
-      <input type="text"
-             class="form-control"
-             placeholder="e.g., Coconut Milk, Fresh Basil"
-             data-ingredients-target="newIngredient"
-             style="flex: 1;">
-      <button type="button"
-              class="btn btn-success"
-              data-action="click->ingredients#addNew"
-              style="white-space: nowrap;">
-        Add New
-      </button>
-    </div>
-    <small class="help-text">Type ingredient name and click "Add New" - it will be created in the database</small>
-  </div>
-
-  <!-- Template for new ingredients -->
-  <template data-ingredients-target="template">
-    <div class="ingredient-row" style="padding: 15px; margin-bottom: 12px; border: 1px solid #dee2e6; border-radius: 6px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-      <input type="hidden"
-             name="recipe[recipe_ingredients_attributes][INDEX][ingredient_id]"
-             value="INGREDIENT_ID">
-
-      <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr auto; gap: 15px; align-items: center;">
-        <!-- Ingredient name -->
-        <div>
-          <strong style="color: #2c3e50; font-size: 1.05em;">INGREDIENT_NAME</strong>
-        </div>
-
-        <!-- Quantity input -->
-        <div>
-          <input type="text"
-                 name="recipe[recipe_ingredients_attributes][INDEX][quantity]"
-                 class="form-control"
-                 placeholder="e.g., 2, 500"
-                 required
-                 style="width: 100%;">
-          <small class="help-text" style="font-size: 0.85em;">Quantity *</small>
-        </div>
-
-        <!-- Unit select -->
-        <div>
-          <select name="recipe[recipe_ingredients_attributes][INDEX][unit]"
-                  class="form-control"
-                  required
-                  style="width: 100%;">
-            <option value="">Select unit</option>
-            <option value="cups">cups</option>
-            <option value="tbsp">tbsp</option>
-            <option value="tsp">tsp</option>
-            <option value="g">g</option>
-            <option value="kg">kg</option>
-            <option value="ml">ml</option>
-            <option value="l">l</option>
-            <option value="oz">oz</option>
-            <option value="lb">lb</option>
-            <option value="pieces">pieces</option>
-            <option value="pinch">pinch</option>
-          </select>
-          <small class="help-text" style="font-size: 0.85em;">Unit *</small>
-        </div>
-
-        <!-- Remove button -->
-        <div>
-          <button type="button"
-                  class="btn btn-sm btn-danger"
-                  data-action="click->ingredients#remove">
-            ✕ Remove
-          </button>
+          <% else %>
+            <p style="color: #6c757d; margin: 0; font-style: italic;">No ingredients added yet. Select from dropdown or add new below.</p>
+          <% end %>
         </div>
       </div>
+
+      <!-- Add new ingredient -->
+      <div class="form-group">
+        <label>Or Add New Ingredient (not in database)</label>
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <input type="text"
+                 class="form-control"
+                 placeholder="e.g., Coconut Milk, Fresh Basil"
+                 data-ingredients-target="newIngredient"
+                 style="flex: 1;">
+          <button type="button"
+                  class="btn btn-success"
+                  data-action="click->ingredients#addNew"
+                  style="white-space: nowrap;">
+            Add New
+          </button>
+        </div>
+        <small class="help-text">Type ingredient name and click "Add New" - it will be created in the database</small>
+      </div>
+
+      <!-- Template for new ingredients -->
+      <template data-ingredients-target="template">
+        <div class="ingredient-row" style="padding: 15px; margin-bottom: 12px; border: 1px solid #dee2e6; border-radius: 6px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <input type="hidden"
+                 name="recipe[recipe_ingredients_attributes][][ingredient_id]"
+                 value="INGREDIENT_ID">
+
+          <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr auto; gap: 15px; align-items: center;">
+            <!-- Ingredient name -->
+            <div>
+              <strong style="color: #2c3e50; font-size: 1.05em;">INGREDIENT_NAME</strong>
+            </div>
+
+            <!-- Quantity input -->
+            <div>
+              <input type="text"
+                     name="recipe[recipe_ingredients_attributes][][quantity]"
+                     class="form-control"
+                     placeholder="e.g., 2, 500"
+                     required
+                     style="width: 100%;">
+              <small class="help-text" style="font-size: 0.85em;">Quantity *</small>
+            </div>
+
+            <!-- Unit select -->
+            <div>
+              <select name="recipe[recipe_ingredients_attributes][][unit]"
+                      class="form-control"
+                      required
+                      style="width: 100%;">
+                <option value="">Select unit</option>
+                <option value="cups">cups</option>
+                <option value="tbsp">tbsp</option>
+                <option value="tsp">tsp</option>
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="ml">ml</option>
+                <option value="l">l</option>
+                <option value="oz">oz</option>
+                <option value="lb">lb</option>
+                <option value="pieces">pieces</option>
+                <option value="pinch">pinch</option>
+              </select>
+              <small class="help-text" style="font-size: 0.85em;">Unit *</small>
+            </div>
+
+            <!-- Remove button -->
+            <div>
+              <button type="button"
+                      class="btn btn-sm btn-danger"
+                      data-action="click->ingredients#remove">
+                ✕ Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
-  </template>
 
-</div>
-
-
-<!-- Tags Section -->
+    <!-- Tags Section -->
     <div class="form-section">
       <h2>Tags</h2>
       <p class="help-text">Select existing tags or create a new one.</p>
 
       <div class="form-group">
-        <%= f.label :tag_ids, "Select Tags (check all that apply)" %>
+        <label>Select Tags (check all that apply)</label>
         <div class="checkbox-group">
-          <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :tag_name do |b| %>
+          <% Tag.all.each do |tag| %>
             <div class="checkbox-item">
-              <%= b.check_box %>
-              <%= b.label %>
+              <input type="checkbox" 
+                     name="recipe[tag_ids][]" 
+                     value="<%= tag.id %>" 
+                     id="recipe_tag_ids_<%= tag.id %>"
+                     <%= 'checked' if @recipe.tag_ids.include?(tag.id) %>>
+              <label for="recipe_tag_ids_<%= tag.id %>"><%= tag.tag_name %></label>
             </div>
           <% end %>
         </div>
       </div>
 
       <div class="form-group">
-        <%= f.label :new_tag_name, "Or create a new tag" %>
-        <%= f.text_field :new_tag_name, class: "form-control", placeholder: "e.g., Dessert, Healthy, Quick" %>
+        <label for="recipe_new_tag_name">Or create a new tag</label>
+        <input type="text" 
+               id="recipe_new_tag_name"
+               name="recipe[new_tag_name]" 
+               class="form-control" 
+               placeholder="e.g., Dessert, Healthy, Quick">
         <small class="help-text">Enter one tag name. It will be created and assigned to this recipe.</small>
       </div>
     </div>
@@ -231,8 +260,11 @@
     <!-- Form Actions -->
     <div class="form-actions">
       <%= link_to "Cancel", @recipe.new_record? ? recipes_path : recipe_path(@recipe), class: "btn btn-secondary" %>
-      <%= f.submit @recipe.new_record? ? "Create Recipe" : "Update Recipe", class: "btn btn-primary" %>
+      <button type="submit" 
+              class="btn btn-primary" 
+              data-recipe-form-target="submitBtn">
+        <%= @recipe.new_record? ? "Create Recipe" : "Update Recipe" %>
+      </button>
     </div>
-  <% end %>
+  </form>
 </div>
-

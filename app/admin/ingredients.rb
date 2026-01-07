@@ -1,19 +1,8 @@
 ActiveAdmin.register Ingredient do
 
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
+  
    permit_params :name
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:name]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
+ 
   filter :name
   filter :created_at
   index do
@@ -21,6 +10,12 @@ ActiveAdmin.register Ingredient do
     id_column
     column :name
     column :created_at
-    actions
+    actions #to show edit delete update actions
   end
+  form do |f|
+  f.inputs "Basic Information" do
+    f.input :name, label: "Ingredient Name", hint: "Please use singular nouns (e.g., Tomato)"
+  end
+  f.actions # This is required to show the 'Submit' and 'Cancel' buttons
+end
 end

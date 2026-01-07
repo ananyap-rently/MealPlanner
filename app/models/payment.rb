@@ -5,8 +5,8 @@ class Payment < ApplicationRecord
   validates :payment_status, presence: true, inclusion: { in: %w[pending completed] }
   
 
-  scope :pending, -> { where(payment_status: 'pending') }
-  scope :completed, -> { where(payment_status: 'completed') }
+  scope :pending, -> { where(payment_status: 'Pending') }
+  scope :completed, -> { where(payment_status: 'Completed') }
   after_update :mark_item_as_purchased, if: :saved_change_to_payment_status?
 
  

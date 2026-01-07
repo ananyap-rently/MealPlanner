@@ -1,113 +1,38 @@
-
-<div class="container">
-  <!-- Header -->
-  <div class="recipe-header">
-    <div class="header-content">
-      <h1><%= @recipe.title %></h1>
-      <p class="author-info">
-        By <%= @recipe.user.email %> • Created <%= @recipe.created_at.strftime("%B %d, %Y") %>
-      </p>
+<div class="container" 
+     data-controller="recipe-show"
+     data-recipe-show-recipe-id-value="<%= @recipe.id %>">
+  
+  <!-- Recipe content will be loaded here -->
+  <div data-recipe-show-target="content">
+    <!-- Loading state -->
+    <div style="text-align: center; padding: 40px;">
+      <p>Loading recipe...</p>
     </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="content-section">
+    <h2>Comments</h2>
     
-    <div class="header-actions">
-      <%= link_to "Edit", edit_recipe_path(@recipe), class: "btn btn-edit" %>
-      <%= button_to "Delete", recipe_path(@recipe), method: :delete, 
-          data: { turbo_confirm: "Are you sure you want to delete this recipe?" }, 
-          class: "btn btn-delete" %>
-    </div>
-  </div>
-
-  <!-- Recipe Meta Information -->
-  <div class="recipe-meta">
-    <div class="meta-item">
-      <strong>Prep Time:</strong>
-      <span><%= @recipe.prep_time %> minutes</span>
-    </div>
-
-    <div class="meta-item">
-      <strong>Servings:</strong>
-      <span><%= @recipe.servings %> servings</span>
-    </div>
-
-    <% if @recipe.tags.any? %>
-      <div class="meta-item">
-        <strong>Tags:</strong>
-        <div class="tags">
-          <% @recipe.tags.each do |tag| %>
-            <span class="tag"><%= tag.tag_name %></span>
-          <% end %>
+    <!-- Add Comment Form -->
+    <div class="comment-form" data-recipe-show-target="commentForm">
+      <form data-action="submit->recipe-show#submitComment">
+        <div class="form-group">
+          <label>Add a comment</label>
+          <textarea 
+            rows="3" 
+            class="form-control" 
+            placeholder="Share your thoughts..."
+            data-recipe-show-target="commentInput"
+            required></textarea>
         </div>
-      </div>
-    <% end %>
-  </div>
-
-  <!-- Main Content -->
-  <div class="recipe-content">
-    <!-- Ingredients Section -->
-    <div class="content-section">
-      <h2>Ingredients</h2>
-      
-      <% if @recipe.recipe_ingredients.any? %>
-        <ul class="ingredients-list">
-          <% @recipe.recipe_ingredients.each do |recipe_ingredient| %>
-            <li>
-              <strong><%= recipe_ingredient.quantity %></strong> <%= recipe_ingredient.ingredient.name %>
-            </li>
-          <% end %>
-        </ul>
-      <% else %>
-        <p class="empty-message">No ingredients added yet.</p>
-      <% end %>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+      </form>
     </div>
 
-    <!-- Instructions Section -->
-    <div class="content-section">
-      <h2>Instructions</h2>
-      <div class="instructions">
-        <%= simple_format(@recipe.instructions) %>
-      </div>
-    </div>
-
-    <!-- Comments Section -->
-    <div class="content-section">
-      <h2>Comments (<%= @comments.count %>)</h2>
-
-      <!-- Add Comment Form -->
-      <div class="comment-form">
-        <%= form_with(model: [@recipe, @comment], local: true) do |f| %>
-          <div class="form-group">
-            <%= f.label :content, "Add a comment" %>
-            <%= f.text_area :content, rows: 3, class: "form-control", placeholder: "Share your thoughts..." %>
-          </div>
-          <%= f.submit "Post Comment", class: "btn btn-primary" %>
-        <% end %>
-      </div>
-
-      <!-- Comments List -->
-      <% if @comments.any? %>
-        <div class="comments-list">
-          <% @comments.each do |comment| %>
-            <div class="comment">
-              <div class="comment-header">
-                <strong><%= comment.user.email %></strong>
-                <span class="comment-date"><%= time_ago_in_words(comment.created_at) %> ago</span>
-              </div>
-              <div class="comment-content">
-                <%= comment.content %>
-              </div>
-              <% if current_user == comment.user %>
-          <div class="comment-actions">
-            <%= button_to "Delete", recipe_comment_path(@recipe, comment), method: :delete, 
-                data: { turbo_confirm: "Are you sure you want to delete this comment?" }, 
-                class: "btn-delete-comment" %>
-          </div>
-        <% end %>
-            </div>
-          <% end %>
-        </div>
-      <% else %>
-        <p class="empty-message">No comments yet. Be the first to comment!</p>
-      <% end %>
+    <!-- Comments List -->
+    <div class="comments-list" data-recipe-show-target="commentsList">
+      <!-- Comments will be loaded here -->
     </div>
   </div>
 
@@ -117,5 +42,9 @@
   </div>
 </div>
 
-
-  
+<!-- Store current user ID for permission checks -->
+<% if current_user %>
+  <script>
+    document.body.dataset.currentUserId = '<%= current_user.id %>';
+  </script>
+<% end %>

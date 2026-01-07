@@ -14,20 +14,34 @@ module Api
 
       # GET /api/v1/recipes/:id
       def show
-      render json: @recipe, include: [
-    :user, 
-    :tags, 
-    :ingredients, 
-    { comments: { include: :user } }
-  ]
-end
+        render json: @recipe.as_json(
+          include: {
+            user: { only: [:id, :email] },
+            tags: { only: [:id, :tag_name] },
+            ingredients: { only: [:id, :name] },
+            recipe_ingredients: { only: [:id, :ingredient_id, :quantity, :unit] },
+            comments: { 
+              include: { 
+                user: { only: [:id, :email] } 
+              } 
+            }
+          }
+        )
+      end
 
       # POST /api/v1/recipes
       def create
         @recipe = current_user.recipes.build(recipe_params)
         
         if @recipe.save
-          render json: @recipe, status: :created, location: api_v1_recipe_url(@recipe)
+          render json: @recipe.as_json(
+            include: {
+              user: { only: [:id, :email] },
+              tags: { only: [:id, :tag_name] },
+              ingredients: { only: [:id, :name] },
+              recipe_ingredients: { only: [:id, :ingredient_id, :quantity, :unit] }
+            }
+          ), status: :created, location: api_v1_recipe_url(@recipe)
         else
           render json: { errors: @recipe.errors.full_messages }, 
                  status: :unprocessable_entity
@@ -37,7 +51,14 @@ end
       # PATCH/PUT /api/v1/recipes/:id
       def update
         if @recipe.update(recipe_params)
-          render json: @recipe
+          render json: @recipe.as_json(
+            include: {
+              user: { only: [:id, :email] },
+              tags: { only: [:id, :tag_name] },
+              ingredients: { only: [:id, :name] },
+              recipe_ingredients: { only: [:id, :ingredient_id, :quantity, :unit] }
+            }
+          )
         else
           render json: { errors: @recipe.errors.full_messages }, 
                  status: :unprocessable_entity
@@ -67,7 +88,8 @@ end
       end
 
       def set_recipe
-        @recipe = Recipe.find(params[:id])
+        @recipe = Recipe.includes(:user, :tags, :ingredients, :recipe_ingredients, comments: :user)
+                        .find(params[:id])
       end
 
       def authorize_user!

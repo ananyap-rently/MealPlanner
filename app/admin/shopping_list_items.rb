@@ -1,23 +1,18 @@
 ActiveAdmin.register ShoppingListItem do
 
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
-   permit_params :user_id, :purchasable_type, :purchasable_id, :quantity, :is_purchased, :meal_plan_id
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:user_id, :purchasable_type, :purchasable_id, :quantity, :is_purchased, :meal_plan_id]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
+  
+  permit_params :user_id, :purchasable_type, :purchasable_id, :quantity, :is_purchased, :meal_plan_id
+  
+  scope :all, default: true
+  scope :pending
+  scope :purchased do |items|
+    items.where(is_purchased: true)
+  end
+
   filter :user
   filter :purchasable_type, as: :select, collection: ["Item", "Ingredient"]
   filter :is_purchased
-  # filter :meal_plan
+ 
   filter :created_at
   index do
     selectable_column

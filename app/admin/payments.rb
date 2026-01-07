@@ -7,6 +7,9 @@ ActiveAdmin.register Payment do
   #
    permit_params :shopping_list_item_id, :payment_status
   includes shopping_list_item: :purchasable
+  scope :all, default: true
+  scope :pending
+  scope :completed
    #
   # or
   #

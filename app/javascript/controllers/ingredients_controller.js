@@ -1,109 +1,142 @@
+// app/javascript/controllers/ingredients_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["select", "list", "template", "newIngredient"]
 
   connect() {
-    this.index = this.listTarget.querySelectorAll('.ingredient-row').length || 0
     console.log("Ingredients controller connected")
-    console.log("Initial index:", this.index)
+    this.index = this.listTarget.querySelectorAll('.ingredient-row').length
   }
 
-  add(event) {
+  async add(event) {
     event.preventDefault()
-    console.log("Add button clicked")
     
-    const select = this.selectTarget
-    const selectedOption = select.options[select.selectedIndex]
-    
-    if (!selectedOption || selectedOption.value === "") {
-      alert("Please select an ingredient from the dropdown")
+    const selectedId = this.selectTarget.value
+    if (!selectedId) {
+      alert('Please select an ingredient')
       return
     }
 
-    const id = selectedOption.value
-    const name = selectedOption.text
-    
-    console.log(`Adding ingredient: ${name} (ID: ${id})`)
-    this.insertIngredient(id, name, false)
-    
-    select.selectedIndex = 0
+    const selectedOption = this.selectTarget.options[this.selectTarget.selectedIndex]
+    const ingredientName = selectedOption.text
+
+    this.addIngredientToList(selectedId, ingredientName)
+    this.selectTarget.value = ''
   }
 
-  addNew(event) {
+  async addNew(event) {
     event.preventDefault()
-    console.log("Add New button clicked")
     
-    const name = this.newIngredientTarget.value.trim()
-    
-    if (name === "") {
-      alert("Please enter an ingredient name")
+    const ingredientName = this.newIngredientTarget.value.trim()
+    if (!ingredientName) {
+      alert('Please enter an ingredient name')
       return
     }
 
-    console.log(`Adding new ingredient: ${name}`)
-    this.insertIngredient(null, name, true)
-    this.newIngredientTarget.value = ""
+    try {
+      // Create new ingredient via API
+      const response = await fetch('/api/v1/ingredients', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-Token': this.csrfToken
+        },
+        body: JSON.stringify({ ingredient: { name: ingredientName } })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.errors?.[0] || 'Failed to create ingredient')
+      }
+
+      const ingredient = await response.json()
+      
+      // Add to dropdown
+      const option = new Option(ingredient.name, ingredient.id)
+      this.selectTarget.add(option)
+      
+      // Add to selected list
+      this.addIngredientToList(ingredient.id, ingredient.name)
+      
+      // Clear input
+      this.newIngredientTarget.value = ''
+
+    } catch (error) {
+      console.error('Error creating ingredient:', error)
+      alert(error.message || 'Failed to create ingredient')
+    }
   }
 
-  insertIngredient(id, name, isNew = false) {
-    console.log(`Inserting ingredient - ID: ${id}, Name: ${name}, IsNew: ${isNew}`)
-    
-    const placeholderText = this.listTarget.querySelector('p')
-    if (placeholderText) {
-      placeholderText.remove()
-    }
-    
-    let html = this.templateTarget.innerHTML
-    html = html.replace(/INDEX/g, this.index)
-    html = html.replace(/INGREDIENT_NAME/g, name)
-
-    if (isNew) {
-      const oldInput = `name="recipe[recipe_ingredients_attributes][${this.index}][ingredient_id]" value="INGREDIENT_ID"`
-      const newInput = `name="recipe[recipe_ingredients_attributes][${this.index}][new_ingredient_name]" value="${this.escapeHtml(name)}"`
-      html = html.replace(oldInput, newInput)
-    } else {
-      html = html.replace(/INGREDIENT_ID/g, id)
+  addIngredientToList(ingredientId, ingredientName) {
+    // Check if ingredient already added
+    const existingInputs = this.listTarget.querySelectorAll('input[name*="[ingredient_id]"]')
+    for (let input of existingInputs) {
+      if (input.value === ingredientId) {
+        alert('This ingredient is already added')
+        return
+      }
     }
 
-    this.listTarget.insertAdjacentHTML("beforeend", html)
+    // Remove empty message if exists
+    const emptyMessage = this.listTarget.querySelector('p')
+    if (emptyMessage) {
+      emptyMessage.remove()
+    }
+
+    // Clone template
+    const template = this.templateTarget.content.cloneNode(true)
+    const row = template.querySelector('.ingredient-row')
+
+    // Replace placeholders
+    row.innerHTML = row.innerHTML
+      .replace(/INDEX/g, this.index)
+      .replace(/INGREDIENT_ID/g, ingredientId)
+      .replace(/INGREDIENT_NAME/g, ingredientName)
+
+    this.listTarget.appendChild(row)
     this.index++
-    console.log("Ingredient added successfully. New index:", this.index)
   }
 
   remove(event) {
     event.preventDefault()
-    console.log("Remove button clicked (new ingredient)")
-    
-    const row = event.target.closest(".ingredient-row")
-    if (row) {
-      row.remove()
-      console.log("Ingredient removed")
-      
-      if (this.listTarget.children.length === 0) {
-        this.listTarget.innerHTML = '<p style="color: #6c757d; margin: 0; font-style: italic;">No ingredients added yet. Select from dropdown or add new below.</p>'
-      }
+    const row = event.target.closest('.ingredient-row')
+    row.remove()
+
+    // Show empty message if no ingredients left
+    if (this.listTarget.querySelectorAll('.ingredient-row').length === 0) {
+      this.listTarget.innerHTML = '<p style="color: #6c757d; margin: 0; font-style: italic;">No ingredients added yet. Select from dropdown or add new below.</p>'
     }
   }
 
   removeExisting(event) {
     event.preventDefault()
-    console.log("Remove button clicked (existing ingredient)")
+    const row = event.target.closest('.ingredient-row')
+    const destroyField = row.querySelector('.destroy-field')
     
-    const row = event.target.closest(".ingredient-row")
-    if (row) {
-      const destroyField = row.querySelector('.destroy-field')
-      if (destroyField) {
-        destroyField.value = '1'
-      }
+    if (destroyField) {
+      // Mark for destruction (for existing records)
+      destroyField.value = 'true'
       row.style.display = 'none'
-      console.log("Existing ingredient marked for deletion")
+    } else {
+      // Remove from DOM (for new records)
+      row.remove()
+    }
+
+    // Show empty message if no visible ingredients left
+    const visibleRows = Array.from(this.listTarget.querySelectorAll('.ingredient-row'))
+      .filter(r => r.style.display !== 'none')
+    
+    if (visibleRows.length === 0) {
+      const emptyMsg = document.createElement('p')
+      emptyMsg.style.cssText = 'color: #6c757d; margin: 0; font-style: italic;'
+      emptyMsg.textContent = 'No ingredients added yet. Select from dropdown or add new below.'
+      this.listTarget.appendChild(emptyMsg)
     }
   }
 
-  escapeHtml(text) {
-    const div = document.createElement('div')
-    div.textContent = text
-    return div.innerHTML
+  get csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.content || ''
   }
 }

@@ -414,7 +414,7 @@ body {
     border-left: 3px solid #28a745;
   }
 
-  .checkbox-group {
+  /* .checkbox-group {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
@@ -433,14 +433,14 @@ body {
   .checkbox-item label {
     font-weight: normal;
     margin: 0;
-  }
+  } */
 
-  .help-text {
+  /* .help-text {
     font-size: 12px;
     color: #666;
     margin-top: 5px;
     display: block;
-  }
+  } */
 
   .form-actions {
     display: flex;
