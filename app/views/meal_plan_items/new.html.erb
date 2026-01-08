@@ -1,49 +1,143 @@
-<div class="container">
+<div class="container" 
+     data-controller="meal-plan-item-form"
+     data-meal-plan-item-form-meal-plan-id-value="<%= @meal_plan.id %>">
+  
   <h1>Add Item to <%= @meal_plan.category %></h1>
   <p>Plan Date: <%= @meal_plan.start_date.strftime("%B %d, %Y") %></p>
 
-  <%= form_with(model: [@meal_plan, @meal_plan_item], local: true, class: "meal-form") do |f| %>
+  <!-- Error messages container -->
+  <div data-meal-plan-item-form-target="errors"></div>
+
+  <form class="meal-form" 
+        data-meal-plan-item-form-target="form" 
+        data-action="submit->meal-plan-item-form#submit">
     
+    <!-- Schedule Details Section -->
     <section class="form-group">
       <h3>1. Schedule Details</h3>
-      <%= f.label :scheduled_date %>
-      <%= f.date_field :scheduled_date, value: @meal_plan.start_date %>
+      
+      <div class="mb-3">
+        <label for="scheduled_date">Scheduled Date</label>
+        <input 
+          type="date" 
+          id="scheduled_date"
+          name="meal_plan_item[scheduled_date]" 
+          class="form-control"
+          value="<%= @meal_plan.start_date %>"
+          min="<%= @meal_plan.start_date %>"
+          max="<%= @meal_plan.end_date %>"
+          required>
+      </div>
 
-      <%= f.label :meal_slot %>
-      <%= f.select :meal_slot, MealPlanItem.meal_slots.keys.map { |s| [s.titleize, s] } %>
+      <div class="mb-3">
+        <label for="meal_slot">Meal Slot</label>
+        <select 
+          id="meal_slot"
+          name="meal_plan_item[meal_slot]" 
+          class="form-control"
+          required>
+          <option value="">Select meal slot</option>
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+          <option value="snack">Snack</option>
+        </select>
+      </div>
     </section>
 
     <hr>
 
+    <!-- Choose What to Eat Section -->
     <section class="form-group">
       <h3>2. Choose What to Eat</h3>
       <p><small>Fill out only <strong>one</strong> of the sections below:</small></p>
 
-      <div class="option-box">
+      <!-- Option A: Select an Existing Recipe -->
+      <div class="option-box" data-meal-plan-item-form-target="recipeSection">
         <h4>Option A: Select an Existing Recipe</h4>
-        <%= f.hidden_field :plannable_type, value: "Recipe" %>
-        <%= f.collection_select :plannable_id, @recipes, :id, :title, include_blank: "Select a Recipe..." %>
+        <button 
+          type="button" 
+          class="btn btn-sm btn-secondary mb-2"
+          data-action="click->meal-plan-item-form#showRecipeOption">
+          Use This Option
+        </button>
+        <select 
+          class="form-control"
+          data-meal-plan-item-form-target="recipeSelect">
+          <option value="">Select a Recipe...</option>
+          <% Recipe.all.each do |recipe| %>
+            <option value="<%= recipe.id %>"><%= recipe.title %></option>
+          <% end %>
+        </select>
       </div>
 
-      <div class="option-box">
+      <!-- Option B: Select an Existing Item -->
+      <div class="option-box" data-meal-plan-item-form-target="itemSection" style="display: none;">
         <h4>Option B: Select an Existing Item</h4>
-        <%# Note: We manually set the type to Item if this section is used %>
-        <%= f.collection_select :plannable_id, @items, :id, :item_name, include_blank: "Select an Item..." %>
+        <button 
+          type="button" 
+          class="btn btn-sm btn-secondary mb-2"
+          data-action="click->meal-plan-item-form#showItemOption">
+          Use This Option
+        </button>
+        <select 
+          class="form-control"
+          data-meal-plan-item-form-target="itemSelect">
+          <option value="">Select an Item...</option>
+          <% Item.all.each do |item| %>
+            <option value="<%= item.id %>"><%= item.item_name %></option>
+          <% end %>
+        </select>
       </div>
 
-      <div class="option-box">
+      <!-- Option C: Create a New Item -->
+      <div class="option-box" data-meal-plan-item-form-target="createItemSection" style="display: none;">
         <h4>Option C: Create a New Item</h4>
-        <%= label_tag :new_item_name, "Item Name" %>
-        <%= text_field_tag :new_item_name, nil, placeholder: "e.g., Protein Bar" %>
+        <button 
+          type="button" 
+          class="btn btn-sm btn-secondary mb-2"
+          data-action="click->meal-plan-item-form#showCreateItemOption">
+          Use This Option
+        </button>
         
-        <%= label_tag :new_item_quantity, "Quantity/Notes" %>
-        <%= text_field_tag :new_item_quantity, nil, placeholder: "e.g., 2 packs" %>
+        <div class="mb-3">
+          <label for="new_item_name">Item Name</label>
+          <input 
+            type="text" 
+            id="new_item_name"
+            class="form-control"
+            placeholder="e.g., Protein Bar"
+            data-meal-plan-item-form-target="newItemName">
+        </div>
+
+        <div class="mb-3">
+          <label for="new_item_quantity">Quantity/Notes</label>
+          <input 
+            type="text" 
+            id="new_item_quantity"
+            class="form-control"
+            placeholder="e.g., 2 packs"
+            data-meal-plan-item-form-target="newItemQuantity">
+        </div>
       </div>
     </section>
 
+    <!-- Form Actions -->
     <div class="actions">
-      <%= f.submit "Add to Meal Plan", class: "btn-submit" %>
+      <button 
+        type="submit" 
+        class="btn-submit"
+        data-meal-plan-item-form-target="submitBtn">
+        Add to Meal Plan
+      </button>
       <%= link_to "Cancel", meal_plan_path(@meal_plan), class: "btn-cancel" %>
     </div>
-  <% end %>
+  </form>
 </div>
+
+<!-- Store current user ID -->
+<% if current_user %>
+  <script>
+    document.body.dataset.currentUserId = '<%= current_user.id %>';
+  </script>
+<% end %>

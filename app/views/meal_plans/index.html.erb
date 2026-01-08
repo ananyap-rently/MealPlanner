@@ -1,13 +1,8 @@
-<div class="container">
+<div class="container" data-controller="meal-plans">
   <h1>Meal Plans</h1>
 
-  <% if notice %>
-    <div class="alert alert-success"><%= notice %></div>
-  <% end %>
-
-  <% if alert %>
-    <div class="alert alert-danger"><%= alert %></div>
-  <% end %>
+  <!-- Error messages container -->
+  <div data-meal-plans-target="errors"></div>
 
   <!-- Create New Meal Plan Form -->
   <div class="card mb-4">
@@ -15,30 +10,36 @@
       <h3>Create New Meal Plan</h3>
     </div>
     <div class="card-body">
-      <%= form_with model: @meal_plan, local: true do |f| %>
-        <% if @meal_plan.errors.any? %>
-          <div class="alert alert-danger">
-            <h4><%= pluralize(@meal_plan.errors.count, "error") %> prohibited this meal plan from being saved:</h4>
-            <ul>
-              <% @meal_plan.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
+      <form data-meal-plans-target="form" data-action="submit->meal-plans#submit">
         <div class="form-group mb-3">
-          <%= f.label :category, "Category" %>
-          <%= f.text_field :category, class: "form-control", placeholder: "e.g., Weekly, Special Diet, Holiday" %>
+          <label for="meal_plan_category">Category</label>
+          <input 
+            type="text" 
+            id="meal_plan_category"
+            class="form-control" 
+            placeholder="e.g., Weekly, Special Diet, Holiday"
+            data-meal-plans-target="categoryInput"
+            required>
         </div>
 
         <div class="form-group mb-3">
-          <%= f.label :start_date, "Start Date" %>
-          <%= f.date_field :start_date, class: "form-control", value: Date.today %>
+          <label for="meal_plan_start_date">Start Date</label>
+          <input 
+            type="date" 
+            id="meal_plan_start_date"
+            class="form-control" 
+            value="<%= Date.today %>"
+            data-meal-plans-target="startDateInput"
+            required>
         </div>
 
-        <%= f.submit "Create Meal Plan", class: "btn btn-primary" %>
-      <% end %>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          data-meal-plans-target="submitBtn">
+          Create Meal Plan
+        </button>
+      </form>
     </div>
   </div>
 
@@ -48,40 +49,31 @@
       <h3>Your Meal Plans</h3>
     </div>
     <div class="card-body">
-      <% if @meal_plans.any? %>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Start Date</th>
-              <th>End Date</th>
-              <th>Created By</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @meal_plans.each do |meal_plan| %>
-              <tr>
-                <td><%= meal_plan.category %></td>
-                <td><%= meal_plan.start_date.strftime("%B %d, %Y") %></td>
-                <td><%= meal_plan.end_date.strftime("%B %d, %Y") %></td>
-                <td><%= meal_plan.user.email %></td>
-                <td>
-                  <%= link_to "View", meal_plan_path(meal_plan), class: "btn btn-sm btn-info" %>
-                  <% if meal_plan.user == current_user %>
-                    <%= button_to "Delete", meal_plan_path(meal_plan), 
-                        method: :delete, 
-                        class: "btn btn-sm btn-danger",
-                        form: { data: { turbo_confirm: "Are you sure?" } } %>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      <% else %>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Created By</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody data-meal-plans-target="tableBody">
+          <!-- Meal plans will be loaded here via JavaScript -->
+        </tbody>
+      </table>
+
+      <div data-meal-plans-target="emptyState" style="display: none;">
         <p class="text-muted">No meal plans yet. Create your first one above!</p>
-      <% end %>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- Store current user ID for permission checks -->
+<% if current_user %>
+  <script>
+    document.body.dataset.currentUserId = '<%= current_user.id %>';
+  </script>
+<% end %>

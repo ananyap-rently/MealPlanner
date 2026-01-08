@@ -27,6 +27,8 @@ export default class extends Controller {
       if (!response.ok) throw new Error('Failed to load meal plan')
 
       const data = await response.json()
+      console.log('Meal plan data received:', data)
+      console.log('Items by date:', data.items_by_date)
       this.renderMealPlan(data)
     } catch (error) {
       console.error('Error loading meal plan:', error)
@@ -64,7 +66,16 @@ export default class extends Controller {
   renderCalendar(mealPlan, itemsByDate) {
     const startDate = new Date(mealPlan.start_date)
     const endDate = new Date(mealPlan.end_date)
-    const hasItems = Object.keys(itemsByDate).length > 0
+    
+    // Convert itemsByDate object to use consistent date format
+    const normalizedItemsByDate = {}
+    Object.keys(itemsByDate).forEach(dateKey => {
+      // Ensure date is in YYYY-MM-DD format
+      const normalizedDate = new Date(dateKey).toISOString().split('T')[0]
+      normalizedItemsByDate[normalizedDate] = itemsByDate[dateKey]
+    })
+
+    const hasItems = Object.keys(normalizedItemsByDate).length > 0
 
     const addAllButton = hasItems ? `
       <button 
@@ -91,13 +102,14 @@ export default class extends Controller {
       `
     } else {
       // Iterate through each date in the range
-      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-        const dateStr = d.toISOString().split('T')[0]
-        const items = itemsByDate[dateStr] || []
+      const currentDate = new Date(startDate)
+      while (currentDate <= endDate) {
+        const dateStr = currentDate.toISOString().split('T')[0]
+        const items = normalizedItemsByDate[dateStr] || []
 
         calendarHTML += `
           <div class="meal-day mb-4 pb-3 border-bottom">
-            <h5 class="mb-3">${this.formatDate(d)}</h5>
+            <h5 class="mb-3">${this.formatDate(new Date(currentDate))}</h5>
         `
 
         if (items.length > 0) {
@@ -128,6 +140,9 @@ export default class extends Controller {
         }
 
         calendarHTML += '</div>'
+        
+        // Move to next day
+        currentDate.setDate(currentDate.getDate() + 1)
       }
     }
 
@@ -139,15 +154,17 @@ export default class extends Controller {
     const badgeClass = item.plannable_type === 'Recipe' ? 'info' : 'secondary'
     let itemContent = ''
 
-    if (item.plannable_type === 'Recipe' && item.plannable) {
-      itemContent = `<strong>${item.plannable.title}</strong>`
-    } else if (item.plannable_type === 'Item' && item.plannable) {
-      itemContent = `<strong>${item.plannable.item_name}</strong>`
+    if (!item.plannable) {
+      itemContent = '<span class="text-muted">[Deleted item]</span>'
+    } else if (item.plannable_type === 'Recipe') {
+      itemContent = `<strong>${item.plannable.title || 'Unknown Recipe'}</strong>`
+    } else if (item.plannable_type === 'Item') {
+      itemContent = `<strong>${item.plannable.item_name || 'Unknown Item'}</strong>`
       if (item.plannable.quantity) {
         itemContent += ` <span class="text-muted">(${item.plannable.quantity})</span>`
       }
     } else {
-      itemContent = '<span class="text-muted">[Deleted item]</span>'
+      itemContent = '<span class="text-muted">[Unknown item type]</span>'
     }
 
     return `
@@ -204,15 +221,42 @@ export default class extends Controller {
     `
   }
 
+  toggleType(event) {
+    const selectedType = event.target.value
+    const recipeSelect = document.getElementById('recipe-select')
+    const itemSelect = document.getElementById('item-select')
+    const itemCreateSection = document.getElementById('item-create')
+
+    if (selectedType === 'Recipe') {
+      recipeSelect.style.display = 'block'
+      itemSelect.style.display = 'none'
+      itemCreateSection.style.display = 'none'
+    } else if (selectedType === 'Item') {
+      recipeSelect.style.display = 'none'
+      itemSelect.style.display = 'block'
+      itemCreateSection.style.display = 'block'
+    }
+  }
+
   async addItem(event) {
     event.preventDefault()
     
     const formData = new FormData(event.target)
+    const plannableType = formData.get('meal_plan_item[plannable_type]')
+    
+    // Determine plannable_id based on type
+    let plannableId = null
+    if (plannableType === 'Recipe') {
+      plannableId = formData.get('meal_plan_item[recipe_id]')
+    } else if (plannableType === 'Item') {
+      plannableId = formData.get('meal_plan_item[item_id]')
+    }
+
     const itemData = {
       scheduled_date: formData.get('meal_plan_item[scheduled_date]'),
       meal_slot: formData.get('meal_plan_item[meal_slot]'),
-      plannable_type: formData.get('meal_plan_item[plannable_type]'),
-      plannable_id: formData.get('meal_plan_item[plannable_id]')
+      plannable_type: plannableType,
+      plannable_id: plannableId
     }
 
     // Handle new item creation if needed
@@ -241,11 +285,19 @@ export default class extends Controller {
         return
       }
 
+      // Show success message
+      if (data.message) {
+        this.showSuccess(data.message)
+      }
+
       // Reload meal plan to show updated calendar
       this.loadMealPlan()
       
       // Clear form
       event.target.reset()
+      // Reset to Recipe type by default
+      document.querySelector('input[name="meal_plan_item[plannable_type]"][value="Recipe"]').checked = true
+      this.toggleType({ target: { value: 'Recipe' } })
       this.clearErrors()
 
     } catch (error) {
@@ -428,6 +480,22 @@ export default class extends Controller {
     `
     this.errorsTarget.innerHTML = errorHtml
     this.errorsTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+
+  showSuccess(message) {
+    if (!this.hasErrorsTarget) return
+
+    const successHtml = `
+      <div class="alert alert-success">
+        ${message}
+      </div>
+    `
+    this.errorsTarget.innerHTML = successHtml
+    
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+      this.clearErrors()
+    }, 3000)
   }
 
   clearErrors() {

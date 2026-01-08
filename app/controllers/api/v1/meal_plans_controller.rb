@@ -7,7 +7,21 @@ module Api
       # GET /api/v1/meal_plans
       def index
         @meal_plans = MealPlan.includes(:user).order(created_at: :desc)
-        render json: @meal_plans
+        render json: @meal_plans.map { |meal_plan|
+          {
+            id: meal_plan.id,
+            category: meal_plan.category,
+            start_date: meal_plan.start_date,
+            end_date: meal_plan.end_date,
+            user_id: meal_plan.user_id,
+            created_at: meal_plan.created_at,
+            updated_at: meal_plan.updated_at,
+            user: {
+              id: meal_plan.user.id,
+              email: meal_plan.user.email
+            }
+          }
+        }
       end
 
       # POST /api/v1/meal_plans
@@ -21,16 +35,61 @@ module Api
 
       # GET /api/v1/meal_plans/:id
       def show
-        # Organize data into a single response for the API client
-        render json: {
-          meal_plan: @meal_plan,
-          items_by_date: @meal_plan.meal_plan_items
-                                   .includes(:plannable)
-                                   .order(:scheduled_date, :meal_slot)
-                                   .group_by(&:scheduled_date),
-          comments: @meal_plan.comments.includes(:user)
-        }
-      end
+  # Load meal plan items with their plannables
+  meal_plan_items = @meal_plan.meal_plan_items
+                               .includes(:plannable)
+                               .order(:scheduled_date, :meal_slot)
+  
+  # Group items by date
+  items_by_date = meal_plan_items.group_by { |item| item.scheduled_date.to_s }
+  
+  # Format the response with full item details
+  formatted_items_by_date = {}
+  items_by_date.each do |date, items|
+    formatted_items_by_date[date] = items.map do |item|
+      {
+        id: item.id,
+        scheduled_date: item.scheduled_date,
+        meal_slot: item.meal_slot,
+        plannable_type: item.plannable_type,
+        plannable_id: item.plannable_id,
+        plannable: item.plannable ? {
+          id: item.plannable.id,
+          title: item.plannable.respond_to?(:title) ? item.plannable.title : nil,
+          item_name: item.plannable.respond_to?(:item_name) ? item.plannable.item_name : nil,
+          quantity: item.plannable.respond_to?(:quantity) ? item.plannable.quantity : nil
+        } : nil
+      }
+    end
+  end
+  
+  # Get comments
+  comments = @meal_plan.comments.includes(:user).map do |comment|
+    {
+      id: comment.id,
+      content: comment.content,
+      created_at: comment.created_at,
+      user: {
+        id: comment.user.id,
+        email: comment.user.email
+      }
+    }
+  end
+  
+  render json: {
+    meal_plan: {
+      id: @meal_plan.id,
+      category: @meal_plan.category,
+      start_date: @meal_plan.start_date,
+      end_date: @meal_plan.end_date,
+      user_id: @meal_plan.user_id,
+      created_at: @meal_plan.created_at,
+      updated_at: @meal_plan.updated_at
+    },
+    items_by_date: formatted_items_by_date,
+    comments: comments
+  }
+end
 
       # DELETE /api/v1/meal_plans/:id
       def destroy

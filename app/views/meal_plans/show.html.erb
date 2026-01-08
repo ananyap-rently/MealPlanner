@@ -1,19 +1,17 @@
-<div class="meal-plan-container">
-  <div class="meal-plan-header">
+<div class="meal-plan-container" 
+     data-controller="meal-plan-show"
+     data-meal-plan-show-meal-plan-id-value="<%= @meal_plan.id %>">
+  
+  <!-- Header -->
+  <div class="meal-plan-header" data-meal-plan-show-target="header">
+    <!-- Will be populated by JavaScript -->
+    <div style="text-align: center; padding: 20px;">
+      <p>Loading meal plan...</p>
+    </div>
+  </div>
 
-  <h1><%= @meal_plan.category %> Meal Plan</h1>
-  <p class="lead">
-    <%= @meal_plan.start_date.strftime("%B %d, %Y") %> - 
-    <%= @meal_plan.end_date.strftime("%B %d, %Y") %>
-  </p>
-
-  <% if notice %>
-    <div class="alert alert-success"><%= notice %></div>
-  <% end %>
-
-  <% if alert %>
-    <div class="alert alert-danger"><%= alert %></div>
-  <% end %>
+  <!-- Error messages -->
+  <div data-meal-plan-show-target="errors"></div>
 
   <div class="row">
     <!-- Left Column: Add Items Form -->
@@ -23,171 +21,127 @@
           <h4>Add Item to Plan</h4>
         </div>
         <div class="card-body">
-          <%= form_with model: [@meal_plan, @meal_plan_item], local: true do |f| %>
-            <% if @meal_plan_item.errors.any? %>
-              <div class="alert alert-danger">
-                <ul class="mb-0">
-                  <% @meal_plan_item.errors.full_messages.each do |message| %>
-                    <li><%= message %></li>
-                  <% end %>
-                </ul>
-              </div>
-            <% end %>
+          <form data-action="submit->meal-plan-show#addItem">
+            <div class="form-group mb-3">
+              <label for="scheduled_date">Date</label>
+              <input 
+                type="date" 
+                id="scheduled_date"
+                name="meal_plan_item[scheduled_date]"
+                class="form-control" 
+                min="<%= @meal_plan.start_date %>"
+                max="<%= @meal_plan.end_date %>"
+                value="<%= @meal_plan.start_date %>"
+                required>
+            </div>
 
             <div class="form-group mb-3">
-              <%= f.label :scheduled_date, "Date" %>
-              <%= f.date_field :scheduled_date, 
-                  class: "form-control", 
-                  min: @meal_plan.start_date,
-                  max: @meal_plan.end_date,
-                  value: params.dig(:meal_plan_item, :scheduled_date) || @meal_plan.start_date,
-                  required: true %>
+              <label for="meal_slot">Meal Slot</label>
+              <select 
+                id="meal_slot"
+                name="meal_plan_item[meal_slot]"
+                class="form-control" 
+                required>
+                <option value="">Select meal slot</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+                <option value="snack">Snack</option>
+              </select>
             </div>
-             <div class="form-group mb-3">
-  <%= f.label :meal_slot, "Meal Slot" %>
-  <%= f.select :meal_slot, 
-      [ ['Breakfast', 'breakfast'], ['Lunch', 'lunch'], ['Dinner', 'dinner'], ['Snack', 'snack'] ], 
-      { selected: @meal_plan_item.meal_slot, prompt: "Select meal slot" }, 
-      { class: "form-control", required: true } %>
-</div>
-           
-            
+
             <!-- Radio buttons to choose Recipe or Item -->
             <div class="form-group mb-3">
               <label>Type</label>
               <div>
                 <label class="radio-inline me-3">
-                  <%= radio_button_tag 'meal_plan_item[plannable_type]', 'Recipe',
-                      params.dig(:meal_plan_item, :plannable_type) == 'Recipe' || params.dig(:meal_plan_item, :plannable_type).nil?,
-                      onchange: 'this.form.submit()' %>
+                  <input 
+                    type="radio" 
+                    name="meal_plan_item[plannable_type]" 
+                    value="Recipe"
+                    checked
+                    data-action="change->meal-plan-show#toggleType">
                   Recipe
                 </label>
                 <label class="radio-inline">
-                  <%= radio_button_tag 'meal_plan_item[plannable_type]', 'Item',
-                      params.dig(:meal_plan_item, :plannable_type) == 'Item',
-                      onchange: 'this.form.submit()' %>
+                  <input 
+                    type="radio" 
+                    name="meal_plan_item[plannable_type]" 
+                    value="Item"
+                    data-action="change->meal-plan-show#toggleType">
                   Item
                 </label>
               </div>
               <small class="text-muted">Select a type to see options below</small>
             </div>
 
-            <!-- Show Recipe Dropdown if Recipe is selected -->
-            <% if params.dig(:meal_plan_item, :plannable_type) == "Recipe" || params.dig(:meal_plan_item, :plannable_type).nil? %>
-              <div class="form-group mb-3">
-                <%= f.label :plannable_id, "Select Recipe" %>
-                <%= f.select :plannable_id,
-                    options_from_collection_for_select(@recipes, :id, :title, params.dig(:meal_plan_item, :plannable_id)),
-                    { prompt: "Choose a recipe" },
-                    { class: "form-control", required: true } %>
-              </div>
-            <% end %>
+            <!-- Recipe Dropdown -->
+            <div class="form-group mb-3" id="recipe-select">
+              <label for="recipe_id">Select Recipe</label>
+              <select 
+                id="recipe_id"
+                name="meal_plan_item[recipe_id]"
+                class="form-control">
+                <option value="">Choose a recipe</option>
+                <% Recipe.all.each do |recipe| %>
+                  <option value="<%= recipe.id %>"><%= recipe.title %></option>
+                <% end %>
+              </select>
+            </div>
 
-            <!-- Show Item Options if Item is selected -->
-            <% if params.dig(:meal_plan_item, :plannable_type) == "Item" %>
+            <!-- Item Options -->
+            <div id="item-select" style="display: none;">
               <div class="form-group mb-3">
-                <%= f.label :plannable_id, "Select Existing Item" %>
-                <%= f.select :plannable_id,
-                    options_from_collection_for_select(@items, :id, :item_name, params.dig(:meal_plan_item, :plannable_id)),
-                    { prompt: "Choose an item" },
-                    { class: "form-control" } %>
+                <label for="item_id">Select Existing Item</label>
+                <select 
+                  id="item_id"
+                  name="meal_plan_item[item_id]"
+                  class="form-control">
+                  <option value="">Choose an item</option>
+                  <% Item.all.each do |item| %>
+                    <option value="<%= item.id %>"><%= item.item_name %></option>
+                  <% end %>
+                </select>
               </div>
 
               <div class="text-center my-2">
                 <strong>OR</strong>
               </div>
 
-              <div class="form-group mb-3">
-                <%= label_tag :new_item_name, "Create New Item" %>
-                <%= text_field_tag :new_item_name, params[:new_item_name], 
-                    class: "form-control", 
-                    placeholder: "Item name" %>
-              </div>
+              <div id="item-create">
+                <div class="form-group mb-3">
+                  <label for="new_item_name">Create New Item</label>
+                  <input 
+                    type="text" 
+                    id="new_item_name"
+                    name="new_item_name"
+                    class="form-control" 
+                    placeholder="Item name">
+                </div>
 
-              <div class="form-group mb-3">
-                <%= label_tag :new_item_quantity, "Quantity (optional)" %>
-                <%= text_field_tag :new_item_quantity, params[:new_item_quantity], 
-                    class: "form-control", 
-                    placeholder: "e.g., 2 lbs" %>
+                <div class="form-group mb-3">
+                  <label for="new_item_quantity">Quantity (optional)</label>
+                  <input 
+                    type="text" 
+                    id="new_item_quantity"
+                    name="new_item_quantity"
+                    class="form-control" 
+                    placeholder="e.g., 2 lbs">
+                </div>
               </div>
-            <% end %>
+            </div>
 
-            <%= f.submit "Add to Plan", class: "btn btn-primary w-100" %>
-          <% end %>
+            <button type="submit" class="btn btn-primary w-100">Add to Plan</button>
+          </form>
         </div>
       </div>
     </div>
 
     <!-- Right Column: Meal Plan Calendar View -->
-<div class="col-md-8">
-  <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h4 class="mb-0">Your Meal Plan</h4>
-      <% if @meal_plan.meal_plan_items.any? %>
-        <%= button_to "Add All to Shopping List", 
-            add_to_shopping_list_meal_plan_meal_plan_items_path(@meal_plan),
-            method: :post,
-            class: "btn btn-success btn-sm",
-            form: { data: { turbo_confirm: "Add all items to your shopping list?" } } %>
-      <% end %>
-    </div>
-    <div class="card-body">
-      <% if @items_by_date.any? %>
-        <% (@meal_plan.start_date..@meal_plan.end_date).each do |date| %>
-          <div class="meal-day mb-4 pb-3 border-bottom">
-            <h5 class="mb-3">
-              <%= date.strftime("%A, %B %d") %>
-            </h5>
-
-            <% if @items_by_date[date].present? %>
-              <% ['breakfast', 'lunch', 'dinner', 'snack'].each do |slot| %>
-                <% slot_items = @items_by_date[date].select { |item| item.meal_slot == slot } %>
-                <% if slot_items.any? %>
-                  <div class="meal-slot mb-3">
-                    <h6 class="text-muted">
-                      <%= slot.capitalize %>
-                    </h6>
-                    <ul class="list-group">
-                      <% slot_items.each do |item| %>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                          <div>
-                            <span class="badge bg-<%= item.plannable_type == 'Recipe' ? 'info' : 'secondary' %> me-2">
-                              <%= item.plannable_type %>
-                            </span>
-                            <% if item.plannable_type == "Recipe" && item.plannable.present? %>
-                              <strong><%= item.plannable.title %></strong>
-                            <% elsif item.plannable_type == "Item" && item.plannable.present? %>
-                              <strong><%= item.plannable.item_name %></strong>
-                              <% if item.plannable.quantity.present? %>
-                                <span class="text-muted">(<%= item.plannable.quantity %>)</span>
-                              <% end %>
-                            <% else %>
-                              <span class="text-muted">[Deleted item]</span>
-                            <% end %>
-                          </div>
-                          <%= button_to "Remove", 
-                              meal_plan_meal_plan_item_path(@meal_plan, item),
-                              method: :delete,
-                              class: "btn btn-sm btn-outline-danger",
-                              form: { data: { turbo_confirm: "Remove this item?" } } %>
-                        </li>
-                      <% end %>
-                    </ul>
-                  </div>
-                <% end %>
-              <% end %>
-            <% else %>
-              <p class="text-muted small">No items planned for this day</p>
-            <% end %>
-          </div>
-        <% end %>
-      <% else %>
-        <div class="text-center py-5">
-          <p class="text-muted">No items added yet. Use the form on the left to start planning your meals!</p>
-        </div>
-      <% end %>
-    </div>
-  </div>
+    <div class="col-md-8">
+      <div class="card mb-4" data-meal-plan-show-target="calendar">
+        <!-- Calendar will be populated by JavaScript -->
+      </div>
 
       <!-- Comments Section -->
       <div class="card">
@@ -196,45 +150,23 @@
         </div>
         <div class="card-body">
           <!-- Add Comment Form -->
-          <%= form_with model: [@meal_plan, @comment], local: true do |f| %>
+          <form data-action="submit->meal-plan-show#submitComment" data-meal-plan-show-target="commentForm">
             <div class="form-group mb-3">
-              <%= f.text_area :content, 
-                  class: "form-control", 
-                  rows: 3, 
-                  placeholder: "Add a comment...",
-                  required: true %>
+              <textarea 
+                class="form-control" 
+                rows="3" 
+                placeholder="Add a comment..."
+                data-meal-plan-show-target="commentInput"
+                required></textarea>
             </div>
-            <%= f.submit "Post Comment", class: "btn btn-primary" %>
-          <% end %>
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+          </form>
 
           <!-- Display Comments -->
           <hr>
-          <% if @comments.any? %>
-            <div class="comments-list">
-              <% @comments.each do |comment| %>
-                <div class="comment mb-3 p-3 border rounded">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                      <strong><%= comment.user.email %></strong>
-                      <small class="text-muted d-block">
-                        <%= time_ago_in_words(comment.created_at) %> ago
-                      </small>
-                    </div>
-                    <% if comment.user == current_user %>
-                      <%= button_to "Delete", 
-                          meal_plan_comment_path(@meal_plan, comment),
-                          method: :delete,
-                          class: "btn btn-sm btn-outline-danger",
-                          form: { data: { turbo_confirm: "Delete this comment?" } } %>
-                    <% end %>
-                  </div>
-                  <p class="mt-2 mb-0"><%= comment.content %></p>
-                </div>
-              <% end %>
-            </div>
-          <% else %>
-            <p class="text-muted">No comments yet. Be the first to comment!</p>
-          <% end %>
+          <div class="comments-list" data-meal-plan-show-target="commentsList">
+            <!-- Comments will be loaded here -->
+          </div>
         </div>
       </div>
     </div>
@@ -245,3 +177,9 @@
   </div>
 </div>
 
+<!-- Store current user ID for permission checks -->
+<% if current_user %>
+  <script>
+    document.body.dataset.currentUserId = '<%= current_user.id %>';
+  </script>
+<% end %>

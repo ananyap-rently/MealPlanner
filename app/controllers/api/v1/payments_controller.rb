@@ -6,15 +6,14 @@ module Api
 
       # GET /api/v1/payments
       def index
-        @payments = current_user.payments.includes(shopping_list_item: :purchasable).order(created_at: :desc)
-        
-        # We return a structured JSON object containing both lists
-        render json: {
-          all_payments: @payments,
-          pending: @payments.where(payment_status: 'pending'),
-          completed: @payments.where(payment_status: 'completed')
-        }
-      end
+  @payments = current_user.payments.includes(shopping_list_item: :purchasable)
+  
+  render json: {
+    all_payments: render_payment_json(@payments),
+    pending: render_payment_json(@payments.where(payment_status: 'pending')),
+    completed: render_payment_json(@payments.where(payment_status: 'completed'))
+  }
+end
 
       # POST /api/v1/payments
       def create
@@ -55,6 +54,17 @@ module Api
       end
 
       private
+
+      def render_payment_json(payments)
+        payments.as_json(
+          methods: [:item_name], # Pulls the name from the logic we just wrote above
+          include: { 
+            shopping_list_item: { 
+              only: [:quantity, :purchasable_type] 
+            } 
+          }
+        )
+      end
 
       def set_payment
         @payment = current_user.payments.find(params[:id])

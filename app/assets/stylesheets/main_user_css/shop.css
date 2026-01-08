@@ -1,0 +1,83 @@
+/* app/assets/stylesheets/shopping_list_items.css
+
+.table-secondary {
+  opacity: 0.7;
+}
+
+.table-secondary td {
+  text-decoration: line-through;
+}
+
+.form-check-input {
+  cursor: pointer;
+}
+
+.form-check-input:checked {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.nav-tabs .nav-link {
+  cursor: pointer;
+  color: #495057;
+  border: 1px solid transparent;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: #e9ecef #e9ecef #dee2e6;
+  color: #007bff;
+}
+
+.nav-tabs .nav-link.active {
+  color: #495057;
+  background-color: #fff;
+  border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.alert {
+  margin-bottom: 1rem;
+  border-radius: 0.375rem;
+}
+
+.alert-dismissible .btn-close {
+  padding: 0.75rem 1.25rem;
+}
+
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table > :not(caption) > * > * {
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+.d-flex.gap-2 {
+  gap: 0.5rem;
+}
+
+.text-muted {
+  color: #6c757d !important;
+} */

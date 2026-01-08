@@ -45,14 +45,32 @@ export default class extends Controller {
   }
 
   mealPlanRowHTML(plan) {
-    const startDate = new Date(plan.start_date).toLocaleDateString('en-US', { 
-      year: 'numeric', month: 'long', day: 'numeric' 
-    })
-    const endDate = new Date(plan.end_date).toLocaleDateString('en-US', { 
-      year: 'numeric', month: 'long', day: 'numeric' 
-    })
+    // Format dates properly
+    let startDate = 'Invalid Date'
+    let endDate = 'Invalid Date'
+    
+    try {
+      if (plan.start_date) {
+        startDate = new Date(plan.start_date).toLocaleDateString('en-US', { 
+          year: 'numeric', month: 'long', day: 'numeric' 
+        })
+      }
+      if (plan.end_date) {
+        endDate = new Date(plan.end_date).toLocaleDateString('en-US', { 
+          year: 'numeric', month: 'long', day: 'numeric' 
+        })
+      }
+    } catch (e) {
+      console.error('Error formatting dates:', e, plan)
+    }
 
-    const deleteBtn = plan.user_id === this.currentUserId ? `
+    // Get user email
+    const userEmail = plan.user?.email || 'Unknown'
+    
+    // Check if current user can delete
+    const canDelete = plan.user_id === this.currentUserId
+
+    const deleteBtn = canDelete ? `
       <button 
         type="button" 
         class="btn btn-sm btn-danger"
@@ -64,10 +82,10 @@ export default class extends Controller {
 
     return `
       <tr>
-        <td>${plan.category}</td>
+        <td>${plan.category || 'Untitled'}</td>
         <td>${startDate}</td>
         <td>${endDate}</td>
-        <td>${plan.user?.email || 'Unknown'}</td>
+        <td>${userEmail}</td>
         <td>
           <a href="/meal_plans/${plan.id}" class="btn btn-sm btn-info">View</a>
           ${deleteBtn}
