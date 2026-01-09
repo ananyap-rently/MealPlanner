@@ -3,6 +3,10 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+  has_many :access_tokens, 
+           class_name: 'Doorkeeper::AccessToken', 
+           foreign_key: :resource_owner_id, 
+           dependent: :delete_all      
   has_many :recipes, dependent: :destroy
   has_many :meal_plans, dependent: :destroy
   has_many :comments, dependent: :destroy

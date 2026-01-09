@@ -5,6 +5,7 @@ module Api
       # Skip CSRF token verification for API requests
       skip_before_action :verify_authenticity_token
       
+        #before_action :doorkeeper_authorize! 
       # Use token-based or session authentication
       before_action :authenticate_user!
       
