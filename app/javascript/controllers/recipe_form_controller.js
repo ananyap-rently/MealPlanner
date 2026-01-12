@@ -14,15 +14,21 @@ export default class extends Controller {
       this.loadRecipe()
     }
   }
+  getApiController() {
+    const apiController = this.application.getControllerForElementAndIdentifier(
+      document.body,
+      "api"
+    )
+    if (!apiController) {
+      throw new Error('API controller not found. Ensure data-controller="api" is on the <body> element.')
+    }
+    return apiController
+  }
 
   async loadRecipe() {
     try {
-      const response = await fetch(`/api/v1/recipes/${this.recipeIdValue}`, {
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
+      const api = this.getApiController()
+      const response = await api.get(`/api/v1/recipes/${this.recipeIdValue}`)
 
       if (!response.ok) throw new Error('Failed to load recipe')
 
@@ -68,21 +74,15 @@ export default class extends Controller {
     const recipeData = this.buildRecipeData(formData)
 
     try {
+      const api = this.getApiController()
       const url = this.modeValue === 'edit' 
         ? `/api/v1/recipes/${this.recipeIdValue}`
         : '/api/v1/recipes'
       
-      const method = this.modeValue === 'edit' ? 'PATCH' : 'POST'
-
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        },
-        body: JSON.stringify({ recipe: recipeData })
-      })
+      // Use api.patch or api.post based on the mode
+      const response = this.modeValue === 'edit' 
+        ? await api.patch(url, { recipe: recipeData })
+        : await api.post(url, { recipe: recipeData })
 
       const data = await response.json()
 

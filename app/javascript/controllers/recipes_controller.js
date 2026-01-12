@@ -11,13 +11,9 @@ export default class extends Controller {
 
   async loadRecipes() {
     try {
-      const response = await fetch('/api/v1/recipes', {
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
-
+      const apiController = this.getApiController()
+      const response = await apiController.get('/api/v1/recipes')  // ← NOW using API controller!
+      
       if (!response.ok) throw new Error('Failed to load recipes')
 
       const recipes = await response.json()
@@ -78,13 +74,8 @@ export default class extends Controller {
     }
 
     try {
-      const response = await fetch(`/api/v1/recipes/${recipeId}`, {
-        method: 'DELETE',
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
+      const apiController = this.getApiController()
+      const response = await apiController.delete(`/api/v1/recipes/${recipeId}`)
 
       if (!response.ok) throw new Error('Failed to delete recipe')
 
@@ -116,5 +107,17 @@ export default class extends Controller {
 
   get csrfToken() {
     return document.querySelector('meta[name="csrf-token"]')?.content || ''
+  }
+  getApiController() {
+    const apiController = this.application.getControllerForElementAndIdentifier(
+      document.body,
+      "api"
+    )
+    
+    if (!apiController) {
+      throw new Error('API controller not found. Make sure data-controller="api" is on body element.')
+    }
+    
+    return apiController
   }
 }

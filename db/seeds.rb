@@ -12,4 +12,18 @@
 #   user.password = "password123"
 #   user.role = "admin"
 # end
-AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?
+# AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?
+# db/seeds.rb
+
+puts "Creating OAuth Application..."
+
+app = Doorkeeper::Application.find_or_create_by(name: 'Internal SPA') do |a|
+  a.redirect_uri = 'urn:ietf:wg:oauth:2.0:oob'
+  a.scopes = 'read write'
+  a.confidential = false
+end
+
+puts "OAuth Application created!"
+puts "Name: #{app.name}"
+puts "Client ID: #{app.uid}"
+puts "---"

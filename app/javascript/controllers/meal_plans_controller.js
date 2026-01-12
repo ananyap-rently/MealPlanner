@@ -11,12 +11,8 @@ export default class extends Controller {
 
   async loadMealPlans() {
     try {
-      const response = await fetch('/api/v1/meal_plans', {
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
+      const apiController = this.getApiController()
+      const response = await apiController.get('/api/v1/meal_plans')
 
       if (!response.ok) throw new Error('Failed to load meal plans')
 
@@ -24,7 +20,7 @@ export default class extends Controller {
       this.renderMealPlans(mealPlans)
     } catch (error) {
       console.error('Error loading meal plans:', error)
-      this.showError('Failed to load meal plans')
+      this.showError(['Failed to load meal plans'])
     }
   }
 
@@ -107,14 +103,9 @@ export default class extends Controller {
     }
 
     try {
-      const response = await fetch('/api/v1/meal_plans', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        },
-        body: JSON.stringify({ meal_plan: mealPlanData })
+      const apiController = this.getApiController()
+      const response = await apiController.post('/api/v1/meal_plans', {
+        meal_plan: mealPlanData
       })
 
       const data = await response.json()
@@ -144,13 +135,8 @@ export default class extends Controller {
     }
 
     try {
-      const response = await fetch(`/api/v1/meal_plans/${planId}`, {
-        method: 'DELETE',
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
+      const apiController = this.getApiController()
+      const response = await apiController.delete(`/api/v1/meal_plans/${planId}`)
 
       if (!response.ok) {
         const data = await response.json()
@@ -170,6 +156,20 @@ export default class extends Controller {
       console.error('Error deleting meal plan:', error)
       alert(error.message || 'Failed to delete meal plan')
     }
+  }
+
+  // Get the API controller instance
+  getApiController() {
+    const apiController = this.application.getControllerForElementAndIdentifier(
+      document.body,
+      "api"
+    )
+    
+    if (!apiController) {
+      throw new Error('API controller not found. Make sure data-controller="api" is on body element.')
+    }
+    
+    return apiController
   }
 
   showError(messages) {

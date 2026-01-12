@@ -11,15 +11,23 @@ export default class extends Controller {
     console.log("Recipe show controller connected")
     this.loadRecipe()
   }
+  // --- API ACCESSOR ---
+  getApiController() {
+    const apiController = this.application.getControllerForElementAndIdentifier(
+      document.body,
+      "api"
+    )
+    if (!apiController) {
+      throw new Error('API controller not found. Ensure data-controller="api" is on the <body> element.')
+    }
+    return apiController
+  }
 
+  
   async loadRecipe() {
     try {
-      const response = await fetch(`/api/v1/recipes/${this.recipeIdValue}`, {
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
+      const api = this.getApiController()
+      const response = await api.get(`/api/v1/recipes/${this.recipeIdValue}`)
 
       if (!response.ok) throw new Error('Failed to load recipe')
 
@@ -157,14 +165,10 @@ export default class extends Controller {
     }
 
     try {
-      const response = await fetch(`/api/v1/recipes/${this.recipeIdValue}/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        },
-        body: JSON.stringify({ comment: { content } })
+      const api = this.getApiController()
+      // Note: your api.post likely handles JSON.stringify internally
+      const response = await api.post(`/api/v1/recipes/${this.recipeIdValue}/comments`, { 
+        comment: { content } 
       })
 
       if (!response.ok) {
@@ -199,13 +203,8 @@ export default class extends Controller {
     }
 
     try {
-      const response = await fetch(`/api/v1/comments/${commentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
+      const api = this.getApiController()
+      const response = await api.delete(`/api/v1/comments/${commentId}`)
 
       if (!response.ok) throw new Error('Failed to delete comment')
 
@@ -230,13 +229,8 @@ export default class extends Controller {
     }
 
     try {
-      const response = await fetch(`/api/v1/recipes/${this.recipeIdValue}`, {
-        method: 'DELETE',
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
+      const api = this.getApiController()
+      const response = await api.delete(`/api/v1/recipes/${this.recipeIdValue}`)
 
       if (!response.ok) throw new Error('Failed to delete recipe')
 

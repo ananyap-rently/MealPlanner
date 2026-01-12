@@ -17,12 +17,8 @@ export default class extends Controller {
 
   async loadMealPlan() {
     try {
-      const response = await fetch(`/api/v1/meal_plans/${this.mealPlanIdValue}`, {
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
+      const apiController = this.getApiController()
+      const response = await apiController.get(`/api/v1/meal_plans/${this.mealPlanIdValue}`)
 
       if (!response.ok) throw new Error('Failed to load meal plan')
 
@@ -32,7 +28,7 @@ export default class extends Controller {
       this.renderMealPlan(data)
     } catch (error) {
       console.error('Error loading meal plan:', error)
-      this.showError('Failed to load meal plan')
+      this.showError(['Failed to load meal plan'])
     }
   }
 
@@ -264,19 +260,15 @@ export default class extends Controller {
     const newItemQuantity = formData.get('new_item_quantity')
 
     try {
-      const response = await fetch(`/api/v1/meal_plans/${this.mealPlanIdValue}/meal_plan_items`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        },
-        body: JSON.stringify({ 
+      const apiController = this.getApiController()
+      const response = await apiController.post(
+        `/api/v1/meal_plans/${this.mealPlanIdValue}/meal_plan_items`,
+        { 
           meal_plan_item: itemData,
           new_item_name: newItemName,
           new_item_quantity: newItemQuantity
-        })
-      })
+        }
+      )
 
       const data = await response.json()
 
@@ -314,13 +306,10 @@ export default class extends Controller {
     }
 
     try {
-      const response = await fetch(`/api/v1/meal_plans/${this.mealPlanIdValue}/meal_plan_items/${itemId}`, {
-        method: 'DELETE',
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
+      const apiController = this.getApiController()
+      const response = await apiController.delete(
+        `/api/v1/meal_plans/${this.mealPlanIdValue}/meal_plan_items/${itemId}`
+      )
 
       if (!response.ok) throw new Error('Failed to remove item')
 
@@ -340,15 +329,10 @@ export default class extends Controller {
     }
 
     try {
-      const response = await fetch(
+      const apiController = this.getApiController()
+      const response = await apiController.post(
         `/api/v1/meal_plans/${this.mealPlanIdValue}/meal_plan_items/add_to_shopping_list`,
-        {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'X-CSRF-Token': this.csrfToken
-          }
-        }
+        {}
       )
 
       if (!response.ok) throw new Error('Failed to add to shopping list')
@@ -371,15 +355,11 @@ export default class extends Controller {
     }
 
     try {
-      const response = await fetch(`/api/v1/meal_plans/${this.mealPlanIdValue}/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        },
-        body: JSON.stringify({ comment: { content } })
-      })
+      const apiController = this.getApiController()
+      const response = await apiController.post(
+        `/api/v1/meal_plans/${this.mealPlanIdValue}/comments`,
+        { comment: { content } }
+      )
 
       if (!response.ok) {
         const data = await response.json()
@@ -413,13 +393,8 @@ export default class extends Controller {
     }
 
     try {
-      const response = await fetch(`/api/v1/comments/${commentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        }
-      })
+      const apiController = this.getApiController()
+      const response = await apiController.delete(`/api/v1/comments/${commentId}`)
 
       if (!response.ok) throw new Error('Failed to delete comment')
 
@@ -436,6 +411,20 @@ export default class extends Controller {
       console.error('Error deleting comment:', error)
       alert('Failed to delete comment')
     }
+  }
+
+  // Get the API controller instance
+  getApiController() {
+    const apiController = this.application.getControllerForElementAndIdentifier(
+      document.body,
+      "api"
+    )
+    
+    if (!apiController) {
+      throw new Error('API controller not found. Make sure data-controller="api" is on body element.')
+    }
+    
+    return apiController
   }
 
   formatDate(date) {

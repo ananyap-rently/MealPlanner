@@ -2,6 +2,8 @@
 module Api
   module V1
     class PaymentsController < BaseController
+      # before_action -> { doorkeeper_authorize! :write }, only: [:create, :update, :destroy, :clear_completed]
+      # before_action -> { doorkeeper_authorize! :read }, only: [:index]
       before_action :set_payment, only: [:update, :destroy]
 
       # GET /api/v1/payments

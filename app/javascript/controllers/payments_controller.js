@@ -1,3 +1,5 @@
+// app/javascript/controllers/payments_controller.js
+
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
@@ -13,12 +15,17 @@ export default class extends Controller {
 
   async loadPayments() {
     try {
-      const response = await fetch('/api/v1/payments', {
-        headers: { 'Accept': 'application/json' }
-      })
+      const apiController = this.getApiController()
+      const response = await apiController.get('/api/v1/payments')  // ← NOW using API controller!
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
       const data = await response.json()
       this.renderPayments(data)
     } catch (error) {
+      console.error("Error loading payments:", error)
       this.showMessage("Error loading payments", "danger")
     }
   }
@@ -81,35 +88,78 @@ export default class extends Controller {
 
   async updateStatus(event) {
     const { id, status } = event.target.dataset
-    await this.apiCall(`/api/v1/payments/${id}`, 'PATCH', { payment: { payment_status: status } })
-    this.loadPayments()
+    
+    try {
+      const apiController = this.getApiController()
+      const response = await apiController.patch(
+        `/api/v1/payments/${id}`, 
+        { payment: { payment_status: status } }
+      )
+      
+      if (response.ok) {
+        this.showMessage("✓ Payment status updated", "success")
+        this.loadPayments()
+      } else {
+        throw new Error('Failed to update status')
+      }
+    } catch (error) {
+      console.error("Error updating payment:", error)
+      this.showMessage("Failed to update payment status", "danger")
+    }
   }
 
   async destroy(event) {
     if (!confirm("Remove this from payments?")) return
+    
     const { id } = event.target.dataset
-    await this.apiCall(`/api/v1/payments/${id}`, 'DELETE')
-    this.loadPayments()
+    
+    try {
+      const apiController = this.getApiController()
+      const response = await apiController.delete(`/api/v1/payments/${id}`)
+      
+      if (response.ok) {
+        this.showMessage("✓ Payment removed", "success")
+        this.loadPayments()
+      } else {
+        throw new Error('Failed to delete payment')
+      }
+    } catch (error) {
+      console.error("Error deleting payment:", error)
+      this.showMessage("Failed to remove payment", "danger")
+    }
   }
 
   async clearCompleted() {
     if (!confirm("Remove all completed payments?")) return
-    await this.apiCall('/api/v1/payments/clear_completed', 'DELETE')
-    this.loadPayments()
+    
+    try {
+      const apiController = this.getApiController()
+      const response = await apiController.delete('/api/v1/payments/clear_completed')
+      
+      if (response.ok) {
+        this.showMessage("✓ Completed payments cleared", "success")
+        this.loadPayments()
+      } else {
+        throw new Error('Failed to clear completed payments')
+      }
+    } catch (error) {
+      console.error("Error clearing payments:", error)
+      this.showMessage("Failed to clear completed payments", "danger")
+    }
   }
 
-  // Helper for API calls
-  async apiCall(url, method, body = null) {
-    const options = {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-      }
+  // Get the API controller instance (this was MISSING!)
+  getApiController() {
+    const apiController = this.application.getControllerForElementAndIdentifier(
+      document.body,
+      "api"
+    )
+    
+    if (!apiController) {
+      throw new Error('API controller not found. Make sure data-controller="api" is on body element.')
     }
-    if (body) options.body = JSON.stringify(body)
-    const response = await fetch(url, options)
-    return response
+    
+    return apiController
   }
 
   showMessage(text, type) {

@@ -2,6 +2,7 @@
 module Api
   module V1
     class MealPlansController < BaseController
+      
       before_action :set_meal_plan, only: [:show, :destroy]
 
       # GET /api/v1/meal_plans

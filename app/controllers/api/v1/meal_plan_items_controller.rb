@@ -2,6 +2,7 @@
 module Api
   module V1
     class MealPlanItemsController < BaseController
+      
       before_action :set_meal_plan
       before_action :set_meal_plan_item, only: [:destroy]
 

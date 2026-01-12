@@ -5,6 +5,11 @@ Rails.application.routes.draw do
   
   
    devise_for :users
+   # Custom token endpoint
+  post '/api/tokens', to: 'tokens#create'
+  post '/api/tokens/login', to: 'tokens#create_from_credentials'
+  delete '/api/tokens', to: 'tokens#destroy'
+
   resource :profile, controller: 'users', only: [:show, :edit, :update, :destroy]
   # Role selection routes
   resource :role_selection, only: [:new, :create]
