@@ -45,6 +45,19 @@ gem "solid_cable"
 
 gem 'pagy', '~> 9.0'
 
+group :development, :test do
+  # The latest version for Rails 8 support
+  gem 'rspec-rails', '~> 8.0' 
+  
+  # Rails integration for FactoryBot
+  gem 'factory_bot_rails'
+  
+  # Generates the fake data
+  gem 'faker'
+  
+  # # Optional: Great for testing validations/associations in one line
+  # gem 'shoulda-matchers'
+end
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 

@@ -36,14 +36,9 @@ export default class extends Controller {
 
     try {
       // Create new ingredient via API
-      const response = await fetch('/api/v1/ingredients', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-CSRF-Token': this.csrfToken
-        },
-        body: JSON.stringify({ ingredient: { name: ingredientName } })
+      const apiController = this.getApiController()
+      const response = await apiController.post('/api/v1/ingredients', { 
+        ingredient: { name: ingredientName } 
       })
 
       if (!response.ok) {
@@ -138,5 +133,17 @@ export default class extends Controller {
 
   get csrfToken() {
     return document.querySelector('meta[name="csrf-token"]')?.content || ''
+  }
+  getApiController() {
+    const apiController = this.application.getControllerForElementAndIdentifier(
+      document.body,
+      "api"
+    )
+    
+    if (!apiController) {
+      throw new Error('API controller not found. Make sure data-controller="api" is on body element.')
+    }
+    
+    return apiController
   }
 }

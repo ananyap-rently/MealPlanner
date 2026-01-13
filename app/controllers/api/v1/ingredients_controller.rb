@@ -2,7 +2,7 @@
 module Api
   module V1
     class IngredientsController < BaseController
-      skip_before_action :authenticate_user!, only: [:index, :show]
+      skip_before_action :doorkeeper_authorize!, only: [:index, :show]
 
       # GET /api/v1/ingredients
       def index

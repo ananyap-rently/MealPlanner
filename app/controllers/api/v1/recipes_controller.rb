@@ -12,18 +12,18 @@ module Api
       # GET /api/v1/recipes
       # 
       def index
-  recipes_scope = Recipe.includes(:user, :tags, :ingredients).order(created_at: :desc)
-  
-  # Paginate
-  @pagy, @recipes = pagy(recipes_scope, page: params[:page], limit: params[:per_page])
+          recipes_scope = Recipe.includes(:user, :tags, :ingredients).order(created_at: :desc)
+          
+          # Paginate
+          @pagy, @recipes = pagy(recipes_scope, page: params[:page], limit: params[:per_page])
 
-  # Send pagination info in headers (your website ignores these for now)
-  response.headers['X-Total-Count'] = @pagy.count.to_s
-  response.headers['X-Total-Pages'] = @pagy.pages.to_s
+          # Send pagination info in headers (your website ignores these for now)
+          response.headers['X-Total-Count'] = @pagy.count.to_s
+          response.headers['X-Total-Pages'] = @pagy.pages.to_s
 
-  # Render JUST the array (This makes your website work again!)
-  render json: @recipes.as_json(include: [:user, :tags, :ingredients])
-end
+          # Render JUST the array (This makes your website work again!)
+          render json: @recipes.as_json(include: [:user, :tags, :ingredients])
+        end
     #  def index
     #    recipes = Recipe.all
     #     # 1. Define the scope
