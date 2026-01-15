@@ -2,9 +2,18 @@
 FactoryBot.define do
   factory :recipe do
     title { Faker::Food.dish }
+    instructions { Faker::Lorem.paragraph(sentence_count: 5) }
     prep_time { rand(10..120) }
     servings { rand(2..8) }
     association :user
+
+     # Ensure we always have valid string values to avoid TypeErrors
+    after(:build) do |recipe|
+      recipe.title ||= "Default Recipe Title"
+      recipe.instructions ||= "Default recipe instructions"
+      recipe.prep_time ||= 30
+      recipe.servings ||= 4
+    end
 
     trait :with_ingredients do
       after(:create) do |recipe|
