@@ -19,7 +19,7 @@ ActiveAdmin.register Payment do
   #   permitted
   # end
   filter :shopping_list_item_id
- filter :payment_status, as: :select, collection: ["Pending", "Completed"]
+ filter :payment_status, as: :select, collection: ["pending", "completed"]
   
  # 1. Batch Action to mark as Completed
   batch_action :mark_as_completed, confirm: "Mark selected payments as Completed?" do |ids|

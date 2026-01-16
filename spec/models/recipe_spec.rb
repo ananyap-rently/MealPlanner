@@ -40,11 +40,19 @@ RSpec.describe Recipe, type: :model do
 
   # Validation tests
   describe 'validations' do
+    # it 'is invalid without a title' do
+    #   recipe = build(:recipe, title: nil)
+    #   expect(recipe).not_to be_valid
+    #   expect(recipe.errors[:title]).to include("can't be blank")
+    # end
     it 'is invalid without a title' do
-      recipe = build(:recipe, title: nil)
+      recipe = build(:recipe)
+      recipe.title = nil
+
       expect(recipe).not_to be_valid
       expect(recipe.errors[:title]).to include("can't be blank")
     end
+
 
     it 'is valid with a title' do
       recipe = build(:recipe)
@@ -172,8 +180,16 @@ RSpec.describe Recipe, type: :model do
   describe 'polymorphic associations' do
     let(:recipe) { create(:recipe) }
 
+    # it 'can have comments' do
+    #   comment = create(:comment, commentable: recipe)
+    #   expect(recipe.comments).to include(comment)
+    # end
     it 'can have comments' do
-      comment = create(:comment, commentable: recipe)
+      comment = recipe.comments.create!(
+        content: "Great!",
+        user: create(:user)
+      )
+
       expect(recipe.comments).to include(comment)
     end
 
@@ -194,9 +210,17 @@ RSpec.describe Recipe, type: :model do
       expect { recipe.destroy }.to change(RecipeIngredient, :count).by(-1)
     end
 
-    it 'destroys associated comments when recipe is destroyed' do
-      create(:comment, commentable: recipe)
+    # it 'destroys associated comments when recipe is destroyed' do
+    #   create(:comment, commentable: recipe)
       
+    #   expect { recipe.destroy }.to change(Comment, :count).by(-1)
+    # end
+    it 'destroys associated comments when recipe is destroyed' do
+      recipe.comments.create!(
+        content: "Nice recipe!",
+        user: create(:user)
+      )
+
       expect { recipe.destroy }.to change(Comment, :count).by(-1)
     end
 

@@ -2,6 +2,7 @@
 FactoryBot.define do
   factory :shopping_list_item do
     quantity { rand(1..10) }
+    is_purchased { false }
     association :user
     
     # Polymorphic association - defaults to ingredient
