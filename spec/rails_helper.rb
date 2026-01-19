@@ -1,4 +1,6 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
+require 'simplecov'
+SimpleCov.start 'rails'
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
@@ -36,9 +38,24 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :request
+  # This allows you to use admin_admin_users_path
+  config.include Rails.application.routes.url_helpers, type: :request
   config.before(:each, type: :controller) do
     @request.env["devise.mapping"] = Devise.mappings[:user]
   end
+  config.before(:each, type: :request) do
+    host! "localhost:3000" # Optional: helps with URL generation
+  end
+  config.before(:each, type: :request) do
+    # This is the magic line that fixes "Could not find a valid mapping"
+    # It tells Devise to treat the request as an AdminUser scope
+    Warden.test_mode!
+  end
+  
+  config.after(:each, type: :request) do
+    Warden.test_reset!
+  end
+  config.use_transactional_fixtures = true
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')
@@ -73,4 +90,10 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+  Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
 end

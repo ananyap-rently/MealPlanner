@@ -3,7 +3,7 @@ module Api
   module V1
     class SummariesController < BaseController
       # Inherits authenticate_user! and error handling from BaseController
-      
+      before_action :ensure_premium_user
       # GET /api/v1/summaries
       def index
         render json: {
@@ -66,6 +66,15 @@ module Api
           completion_rate: total > 0 ? ((purchased.to_f / total) * 100).round(1) : 0,
           items_by_type: current_user.shopping_list_items.group(:purchasable_type).count
         }
+      end
+      private
+      def ensure_premium_user
+        unless current_user.premium? # Adjust this condition to match your logic
+          render json: { 
+            error: "Forbidden", 
+            message: "This feature is only available to premium subscribers." 
+          }, status: :forbidden # This returns the 403 status code
+        end
       end
     end
   end

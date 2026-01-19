@@ -37,7 +37,14 @@ gem 'faraday_middleware'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
-
+group :test do
+  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
+  # gem "capybara"
+  # gem "selenium-webdriver"
+  
+  # Add this line here:
+  gem "simplecov", require: false
+end
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
 gem "solid_queue"
@@ -51,7 +58,7 @@ group :development, :test do
   
   # Rails integration for FactoryBot
   gem 'factory_bot_rails'
-  
+  gem 'shoulda-matchers'
   # Generates the fake data
   gem 'faker'
   

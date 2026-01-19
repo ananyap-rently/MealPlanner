@@ -17,16 +17,19 @@ class SummariesController < ApplicationController
   def recipes
     
     load_recipe_summary
+    #render :index
   end
   
   def meal_plans
     
     load_meal_plan_summary
+    #render :index
   end
   
   def shopping
   
     load_shopping_summary
+    #render :index
   end
   
   

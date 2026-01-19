@@ -28,16 +28,7 @@ module Api
           per_page:     pagy.limit # In Pagy 9.x, use 'limit' instead of 'items'
         }
       end
-      #  def pagination_metadata(pagy)
-      #   {
-      #     current_page: pagy.page,
-      #     total_pages: pagy.pages,
-      #     total_count: pagy.count,
-      #     per_page: pagy.,
-      #     next_page: pagy.next,
-      #     prev_page: pagy.prev
-      #   }
-      # end
+     
 
 
       # Get current user from OAuth token

@@ -210,11 +210,7 @@ RSpec.describe Recipe, type: :model do
       expect { recipe.destroy }.to change(RecipeIngredient, :count).by(-1)
     end
 
-    # it 'destroys associated comments when recipe is destroyed' do
-    #   create(:comment, commentable: recipe)
-      
-    #   expect { recipe.destroy }.to change(Comment, :count).by(-1)
-    # end
+   
     it 'destroys associated comments when recipe is destroyed' do
       recipe.comments.create!(
         content: "Nice recipe!",

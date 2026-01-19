@@ -306,25 +306,6 @@ RSpec.describe Api::V1::PaymentsController, type: :request do
       end
     end
     
-    # context 'when payment belongs to another user' do
-      
-      
-    #   it 'raises RecordNotFound error' do
-    #     expect {
-    #       delete api_v1_payment_path(payment), headers: other_headers
-    #     }.to raise_error(ActiveRecord::RecordNotFound)
-    #   end
-      
-    #   it 'does not destroy the payment' do
-    #     expect {
-    #       begin
-    #         delete api_v1_payment_path(payment), headers: other_headers
-    #       rescue ActiveRecord::RecordNotFound
-    #         # Expected error
-    #       end
-    #     }.not_to change(Payment, :count)
-    #   end
-    # end
     context 'when payment belongs to another user' do
         it 'returns 404 not found' do
             delete api_v1_payment_path(payment), headers: other_headers

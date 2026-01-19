@@ -45,16 +45,7 @@ RSpec.describe PaymentsController, type: :request do
       end
     end
 
-    #   it 'assigns payments variables' do
-    #     pending_payment = create(:payment, shopping_list_item: create(:shopping_list_item, user: user), payment_status: 'pending')
-    #     completed_payment = create(:payment, shopping_list_item: create(:shopping_list_item, user: user), payment_status: 'completed')
-        
-    #     get payments_path
-    #     expect(assigns(:payments)).not_to be_nil
-    #     expect(assigns(:pending_payments)).not_to be_nil
-    #     expect(assigns(:completed_payments)).not_to be_nil
-    #   end
-    # end
+    
 
     context 'when user is not authenticated' do
       it 'redirects to sign in page' do
@@ -108,9 +99,7 @@ RSpec.describe PaymentsController, type: :request do
         it 'raises record not found error' do
           other_shopping_item = create(:shopping_list_item, user: other_user)
           
-        #   expect {
-        #     post payments_path, params: { shopping_list_item_id: other_shopping_item.id }
-        #   }.to raise_error(ActiveRecord::RecordNotFound)
+       
         post payments_path, params: { shopping_list_item_id: other_shopping_item.id }
         expect(response).to have_http_status(:not_found)
 
@@ -168,9 +157,7 @@ RSpec.describe PaymentsController, type: :request do
       it 'raises record not found error' do
         user_payment = create(:payment, shopping_list_item: create(:shopping_list_item, user: user))
         
-        # expect {
-        #   patch payment_path(user_payment), params: { payment: { payment_status: 'completed' } }
-        # }.to raise_error(ActiveRecord::RecordNotFound)
+        
         patch payment_path(user_payment), params: { payment: { payment_status: 'completed' } }
         expect(response).to have_http_status(:not_found)
 
@@ -221,10 +208,7 @@ RSpec.describe PaymentsController, type: :request do
       it 'raises record not found error' do
         user_payment = create(:payment, shopping_list_item: create(:shopping_list_item, user: user))
         
-    #     expect {
-    #       delete payment_path(user_payment)
-    #     }.to raise_error(ActiveRecord::RecordNotFound)
-    #   end
+   
     delete payment_path(user_payment)
     expect(response).to have_http_status(:not_found)
       end

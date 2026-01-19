@@ -13,3 +13,19 @@ FactoryBot.define do
     expires_in { 2.hours }
   end
 end
+# spec/factories/doorkeeper.rb
+# FactoryBot.define do
+#   factory :oauth_application, class: 'Doorkeeper::Application' do
+#     name { "Internal SPA" }
+#     redirect_uri { "urn:ietf:wg:oauth:2.0:oob" }
+#     scopes { "read write" }
+#     confidential { false }
+#   end
+
+#   factory :access_token, class: 'Doorkeeper::AccessToken' do
+#     association :application, factory: :oauth_application
+#     resource_owner_id { create(:user).id }
+#     expires_in { 2.hours }
+#     scopes { "read write" }
+#   end
+# end
