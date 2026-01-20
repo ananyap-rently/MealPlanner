@@ -247,14 +247,7 @@ RSpec.describe Api::V1::PaymentsController, type: :request do
         end
       end
       
-    #   context 'with invalid parameters' do
-    #     it 'raises an error for invalid status' do
-    #       expect {
-    #         patch api_v1_payment_path(payment), params: { payment: { payment_status: 'invalid' } }, headers: headers
-    #     }.to raise_error(ArgumentError)
-    #     end
-    #   end
-    # end
+  
     context 'with invalid parameters' do
         it 'returns 422 unprocessable entity' do
             patch api_v1_payment_path(payment),

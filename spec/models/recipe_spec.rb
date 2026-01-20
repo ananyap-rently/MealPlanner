@@ -40,11 +40,7 @@ RSpec.describe Recipe, type: :model do
 
   # Validation tests
   describe 'validations' do
-    # it 'is invalid without a title' do
-    #   recipe = build(:recipe, title: nil)
-    #   expect(recipe).not_to be_valid
-    #   expect(recipe.errors[:title]).to include("can't be blank")
-    # end
+   
     it 'is invalid without a title' do
       recipe = build(:recipe)
       recipe.title = nil

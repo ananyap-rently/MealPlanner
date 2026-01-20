@@ -31,11 +31,7 @@ RSpec.describe "Admin::Payments", type: :request do
       expect(response.body).not_to include(payment.id.to_s)
     end
 
-    # it "displays 'No Item Linked' when association is missing" do
-    #   payment.update_column(:shopping_list_item_id, nil)
-    #   get admin_payments_path
-    #   expect(response.body).to include("No Item Linked")
-    # end
+   
   end
 
   describe "Filters" do
@@ -66,16 +62,5 @@ RSpec.describe "Admin::Payments", type: :request do
     end
   end
 
-#   describe "Form Submission" do
-#     it "permits and saves parameters" do
-#       expect {
-#         post admin_payments_path, params: {
-#           payment: {
-#             shopping_list_item_id: shopping_list_item.id,
-#             payment_status: "Completed"
-#           }
-#         }
-#       }.to change(Payment, :count).by(1)
-#     end
-#   end
+
 end

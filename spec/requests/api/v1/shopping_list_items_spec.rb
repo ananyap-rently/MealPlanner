@@ -18,9 +18,7 @@ RSpec.describe "Api::V1::ShoppingListItems", type: :request do
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
       expect(json.size).to eq(2)
-      #json.first['purchasable'].first['item_name']
-
-      #expect(json.first['purchasable']['item_name']).to eq("Milk")
+      
     end
 
     it "does not return other users' shopping items" do

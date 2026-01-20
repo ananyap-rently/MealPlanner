@@ -167,6 +167,53 @@ RSpec.describe Api::V1::RecipesController, type: :request do
     end
   end
   
+  describe 'GET /api/v1/recipes/latest' do
+    context 'when recipes exist' do
+      let!(:old_recipe) { create(:recipe, created_at: 1.day.ago) }
+      let!(:new_recipe) { create(:recipe, created_at: Time.current) }
+      let(:json_response) { JSON.parse(response.body) }
+
+      before { get latest_api_v1_recipes_path }
+
+      it 'returns a 200 OK status' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the most recently created recipe ID' do
+        expect(json_response['id']).to eq(new_recipe.id)
+      end
+
+      it 'includes the associated user information' do
+        expect(json_response['user']).to be_present
+      end
+
+      it 'includes the recipe ingredients list' do
+        expect(json_response).to have_key('recipe_ingredients')
+      end
+
+      it 'does not require an authorization header' do
+        # This is implicitly tested by the 'before' block running without headers
+        expect(response).to have_http_status(:success)
+      end
+    end
+
+    context 'when no recipes exist' do
+      before do
+        Recipe.destroy_all
+        get latest_api_v1_recipes_path
+      end
+
+      it 'returns a 404 Not Found status' do
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'returns the correct error message' do
+        expect(JSON.parse(response.body)['message']).to eq("No recipes found")
+      end
+    end
+  end
+
+  
   describe 'POST /api/v1/recipes' do
     let(:ingredient) { create(:ingredient) }
     let(:tag) { create(:tag) }
@@ -362,9 +409,9 @@ RSpec.describe Api::V1::RecipesController, type: :request do
         }.to change(Recipe, :count).by(-1)
       end
       
-      it 'returns 204 no content status' do
+      it 'returns 200 ok status' do
         delete api_v1_recipe_path(recipe), headers: headers
-        expect(response).to have_http_status(:no_content)
+        expect(response).to have_http_status(:ok)
       end
     end
     

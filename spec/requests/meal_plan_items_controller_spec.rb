@@ -85,7 +85,7 @@ RSpec.describe "MealPlanItems", type: :request do
       shopping_item = user.shopping_list_items.find_by(purchasable: ri.ingredient)
       # 1.5 + 2.0 = 3.5
       expect(shopping_item.quantity.to_f).to eq(3.5)
-      #expect(shopping_item.quantity.to_s).to include("3.5")
+
 
     end
 

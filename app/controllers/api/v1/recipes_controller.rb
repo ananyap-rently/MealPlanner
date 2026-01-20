@@ -2,7 +2,7 @@
 module Api
   module V1
     class RecipesController < BaseController
-      skip_before_action :doorkeeper_authorize!, only: [:index, :show]
+      skip_before_action :doorkeeper_authorize!, only: [:index, :show, :latest]
       before_action :set_recipe, only: [:show, :update, :destroy]
       before_action :authorize_user!, only: [:update, :destroy]
 
@@ -24,22 +24,24 @@ module Api
           # Render JUST the array (This makes your website work again!)
           render json: @recipes.as_json(include: [:user, :tags, :ingredients])
         end
-    #  def index
-    #    recipes = Recipe.all
-    #     # 1. Define the scope
-    #     #recipes_scope = Recipe.includes(:user, :tags, :ingredients).order(created_at: :desc)
-    #     @pagy, @recipe = pagy(recipes,
-    #     page: params[:page],
-    #     limit: params[:per_page])
-    #     # 2. Paginate the scope
-    #     # @pagy, @recipes = pagy(recipes_scope)
+      def latest
+             @recipe = Recipe.includes(:user, :tags, :ingredients, :recipe_ingredients)
+                  .order(created_at: :desc)
+                  .first
 
-    #     # 3. Render structured JSON
-    #     render json: {
-    #        recipes: @recipe.as_json(include: [:user, :tags, :ingredients]),
-    #       pagination: pagination_dict(@pagy)
-    #     }
-    #   end
+        if @recipe
+          render json: @recipe.as_json(
+            include: {
+              user: { only: [:id, :email] },
+              tags: { only: [:id, :tag_name] },
+              ingredients: { only: [:id, :name] },
+              recipe_ingredients: { only: [:id, :ingredient_id, :quantity, :unit] }
+            }
+          )
+          else
+            render json: { message: "No recipes found" }, status: :not_found
+          end
+        end
      
 
       # GET /api/v1/recipes/:id
@@ -98,7 +100,10 @@ module Api
       # DELETE /api/v1/recipes/:id
       def destroy
         @recipe.destroy
-        head :no_content
+        #head :no_content
+        render json: {
+          message: "Recipe deleted successfully"
+        }, status: :ok
       end
 
       private

@@ -1,8 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "Summaries", type: :request do
-  # Removed the explicit 'text/html' headers as they often trigger 406 
-  # errors if the controller/route is not perfectly aligned.
+ 
   
   let(:premium_user) do
     create(:user, role: 'premium', email: "premium#{# Unique email to avoid validation errors

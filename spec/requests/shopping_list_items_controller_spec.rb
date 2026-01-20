@@ -7,14 +7,6 @@ RSpec.describe "ShoppingListItems", type: :request do
   
   before { sign_in user }
 
-#   describe "GET /index" do
-#     it "renders a successful response" do
-#       create(:shopping_list_item, user: user)
-#       get shopping_list_items_path
-#       expect(response).to be_successful
-#       expect(assigns(:items)).to include(item)
-#     end
-#   end
 describe "GET /index" do
   it "renders a successful response" do
     shopping_item = create(:shopping_list_item, user: user, purchasable: item)

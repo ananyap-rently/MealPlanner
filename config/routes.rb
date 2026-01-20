@@ -24,6 +24,9 @@ Rails.application.routes.draw do
        resources :ingredients, only: [:index, :show, :create]
       resources :comments, only: [ :destroy]
       resources :recipes, only: [:index, :show, :create, :update, :destroy] do
+        collection do
+          get 'latest'
+        end
         resources :comments, only: [:index, :create]
       end
       resource :profile, controller: 'users', only: [:show, :update, :destroy]

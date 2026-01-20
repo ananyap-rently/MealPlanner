@@ -16,7 +16,7 @@ RSpec.describe "Api::V1::Ingredients", type: :request do
       
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body)
-      expect(json.first['name']).to eq("Apple") # Alphabetical order check
+      expect(json.first['name']).to eq("Apple") 
       expect(json.size).to eq(2)
     end
 
@@ -62,8 +62,7 @@ RSpec.describe "Api::V1::Ingredients", type: :request do
       end
 
       it "returns created status even with empty name (no validation on Ingredient model)" do
-        # Since Ingredient model doesn't validate presence of name,
-        # this will actually succeed
+        
         post api_v1_ingredients_path, 
              params: { ingredient: { name: "" } }, 
              headers: headers
@@ -84,7 +83,7 @@ RSpec.describe "Api::V1::Ingredients", type: :request do
         
         expect(response).to have_http_status(:created)
         expect(Ingredient.last.name).to eq("Cumin")
-        # unpermitted_field should be ignored
+        
       end
     end
 

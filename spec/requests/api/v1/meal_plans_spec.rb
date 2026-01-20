@@ -68,21 +68,7 @@ RSpec.describe "Api::V1::MealPlans", type: :request do
   expect(json['comments'].first['content']).to eq(comment.content)
   expect(json['comments'].first['user']['id']).to eq(user.id)
 end
-    # it "returns complex nested structure (items grouped by date and comments)" do
-    #   get api_v1_meal_plan_path(meal_plan), headers: headers
-    #   json = JSON.parse(response.body)
-
-    #   # Check Meal Plan details
-    #   expect(json['meal_plan']['id']).to eq(meal_plan.id)
-      
-    #   # Check Items grouped by date
-    #   date_key = Date.today.to_s
-    #   expect(json['items_by_date']).to have_key(date_key)
-    #   expect(json['items_by_date'][date_key].first['plannable']['title']).to be_present
-
-    #   # Check Comments
-    #   expect(json['comments'].first['content']).to eq(comment.content)
-    # end
+   
   end
 
   describe "DELETE /api/v1/meal_plans/:id" do
