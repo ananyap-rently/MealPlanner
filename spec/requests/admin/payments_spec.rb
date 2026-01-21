@@ -24,12 +24,20 @@ RSpec.describe "Admin::Payments", type: :request do
       expect(response.body).not_to include(completed_payment.id.to_s)
     end
 
+    # it "uses the 'completed' scope" do
+    #   completed_payment = create(:payment, :completed)
+    #   get admin_payments_path, params: { scope: 'completed' }
+    #   expect(response.body).to include(completed_payment.id.to_s)
+    #   expect(response.body).not_to include(payment.id.to_s)
+    # end
     it "uses the 'completed' scope" do
-      completed_payment = create(:payment, :completed)
-      get admin_payments_path, params: { scope: 'completed' }
-      expect(response.body).to include(completed_payment.id.to_s)
-      expect(response.body).not_to include(payment.id.to_s)
-    end
+  completed_payment = create(:payment, :completed)
+
+  get admin_payments_path, params: { scope: 'completed' }
+
+  expect(response.body).to include("Item ##{completed_payment.shopping_list_item.id}")
+  expect(response.body).not_to include("Item ##{payment.shopping_list_item.id}")
+end
 
    
   end

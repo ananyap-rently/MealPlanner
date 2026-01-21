@@ -214,9 +214,9 @@ RSpec.describe RecipesController, type: :request do
           }.not_to change(Recipe, :count)
         end
         
-        it 'returns unprocessable entity status' do
+        it 'returns unprocessable content status' do
           post recipes_path, params: { recipe: invalid_attributes }
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
     end
@@ -284,7 +284,7 @@ RSpec.describe RecipesController, type: :request do
         
         it 'returns unprocessable entity status' do
           patch recipe_path(recipe), params: { recipe: invalid_attributes }
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
     end

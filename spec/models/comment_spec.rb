@@ -11,16 +11,24 @@ RSpec.describe Comment, type: :model do
   end
 
   describe 'Polymorphic Behavior' do
-    it 'is valid when associated with a Recipe' do
-      comment = build(:comment, :for_recipe)
-      expect(comment).to be_valid
-      expect(comment.commentable_type).to eq('Recipe')
+    context 'with a Recipe' do
+      let(:comment) { build(:comment, :for_recipe) }
+
+      it { expect(comment).to be_valid }
+      
+      it 'assigns the correct commentable type' do
+        expect(comment.commentable_type).to eq('Recipe')
+      end
     end
 
-    it 'is valid when associated with an Ingredient' do
-      comment = build(:comment, :for_ingredient)
-      expect(comment).to be_valid
-      expect(comment.commentable_type).to eq('Ingredient')
+    context 'with an Ingredient' do
+      let(:comment) { build(:comment, :for_ingredient) }
+
+      it { expect(comment).to be_valid }
+
+      it 'assigns the correct commentable type' do
+        expect(comment.commentable_type).to eq('Ingredient')
+      end
     end
   end
 

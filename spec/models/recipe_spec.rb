@@ -176,10 +176,6 @@ RSpec.describe Recipe, type: :model do
   describe 'polymorphic associations' do
     let(:recipe) { create(:recipe) }
 
-    # it 'can have comments' do
-    #   comment = create(:comment, commentable: recipe)
-    #   expect(recipe.comments).to include(comment)
-    # end
     it 'can have comments' do
       comment = recipe.comments.create!(
         content: "Great!",

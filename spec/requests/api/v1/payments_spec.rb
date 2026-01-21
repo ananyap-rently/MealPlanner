@@ -166,7 +166,7 @@ RSpec.describe Api::V1::PaymentsController, type: :request do
         
         it 'returns 422 unprocessable entity status' do
           post api_v1_payments_path, params: { shopping_list_item_id: shopping_list_item.id }, headers: headers
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
         
         it 'returns error message' do
@@ -254,7 +254,7 @@ RSpec.describe Api::V1::PaymentsController, type: :request do
                 params: { payment: { payment_status: 'invalid' } },
                 headers: headers
 
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
         end
         end
     end

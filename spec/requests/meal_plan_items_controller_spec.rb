@@ -62,12 +62,12 @@ RSpec.describe "MealPlanItems", type: :request do
 
       end
 
-      it "renders show with unprocessable_entity on save failure" do
+      it "renders show with unprocessable_content on save failure" do
         post meal_plan_meal_plan_items_path(meal_plan), params: {
           meal_plan_item: { scheduled_date: nil }, # Validation error
           commit: "Add to Plan"
         }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(flash[:alert]).to include("Could not save item")
       end
     end

@@ -20,7 +20,10 @@ Doorkeeper.configure do
       nil
     end
   end
-
+  # ADD THIS LINE - it allows client credentials without resource owner
+  skip_authorization do
+    true
+  end
   # Token expiration
   access_token_expires_in 2.hours
   authorization_code_expires_in 10.minutes
@@ -32,7 +35,8 @@ Doorkeeper.configure do
   reuse_access_token
 
   # Grant flows to enable
-  grant_flows %w[password authorization_code]
+  #grant_flows %w[password authorization_code]
+  grant_flows %w[password authorization_code client_credentials]
 
   # Skip authorization page for internal app
   skip_authorization do |resource_owner, client|

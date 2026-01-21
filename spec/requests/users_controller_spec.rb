@@ -65,7 +65,7 @@ RSpec.describe "Users", type: :request do
       context "with invalid parameters" do
         it "returns unprocessable entity status" do
           patch profile_path, params: invalid_params
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
     end

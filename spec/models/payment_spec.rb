@@ -3,8 +3,6 @@ require 'rails_helper'
 
 RSpec.describe Payment, type: :model do
   
- 
-
   describe "#item_name" do
     context "when linked to an Item" do
       it "returns the item_name from the purchasable" do

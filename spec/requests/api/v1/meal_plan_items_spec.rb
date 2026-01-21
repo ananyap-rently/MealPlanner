@@ -65,13 +65,13 @@ RSpec.describe "Api::V1::MealPlanItems", type: :request do
   end
 end
     context "with invalid params" do
-      it "returns unprocessable_entity and error messages" do
+      it "returns unprocessable_content and error messages" do
         # Sending empty params to trigger validation failure
         post api_v1_meal_plan_meal_plan_items_path(meal_plan), 
              params: { meal_plan_item: { meal_slot: nil } }, 
              headers: headers
         
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)).to have_key('errors')
       end
     end

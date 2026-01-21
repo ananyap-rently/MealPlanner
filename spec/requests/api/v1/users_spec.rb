@@ -47,8 +47,8 @@ RSpec.describe "Api::V1::Users", type: :request do
         
         patch api_v1_profile_path, params: { user: { name: "" } }, headers: headers
         
-        # BaseController rescues from RecordInvalid with :unprocessable_entity (422)
-        expect(response).to have_http_status(:unprocessable_entity)
+        # BaseController rescues from RecordInvalid with :unprocessable_content (422)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end

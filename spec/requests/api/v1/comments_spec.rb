@@ -50,7 +50,7 @@ RSpec.describe "Api::V1::Comments", type: :request do
         post api_v1_recipe_comments_path(recipe), params: { comment: { content: "" } }, headers: headers
         
         # BaseController catches ActiveRecord::RecordInvalid from .save!
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end

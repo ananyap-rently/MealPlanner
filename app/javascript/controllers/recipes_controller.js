@@ -76,9 +76,14 @@ export default class extends Controller {
     try {
       const apiController = this.getApiController()
       const response = await apiController.delete(`/api/v1/recipes/${recipeId}`)
-
+       if (response.status === 403) {
+          const data = await response.json()
+          alert(data.error || "You are not authorized to delete this recipe.")
+          return
+        }
+        
       if (!response.ok) throw new Error('Failed to delete recipe')
-
+        alert('Recipe deleted successfully!')
       // Remove card from DOM
       const card = event.target.closest('.recipe-card')
       card.remove()
