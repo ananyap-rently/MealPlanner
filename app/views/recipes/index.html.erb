@@ -1,7 +1,23 @@
-<div class="container" data-controller="recipes search">
+<div class="container" data-controller="recipes search" data-current-user-id="<%= current_user&.id %>">
   <div class="header">
-    <h1>My Recipes</h1>
+    <h1>Recipes</h1>
     <%= link_to "Create New Recipe", new_recipe_path, class: "btn btn-primary" %>
+  </div>
+
+  <!-- Toggle between All Recipes and My Recipes -->
+  <div class="recipes-filter-tabs">
+    <button class="filter-tab active" 
+            data-action="click->recipes#loadAllRecipes"
+            data-recipes-target="allRecipesTab">
+      All Recipes
+    </button>
+    <% if current_user %>
+      <button class="filter-tab" 
+              data-action="click->recipes#loadMyRecipes"
+              data-recipes-target="myRecipesTab">
+        My Recipes
+      </button>
+    <% end %>
   </div>
 
   <!-- Search Box -->
@@ -30,7 +46,7 @@
 
   <!-- Empty State -->
   <div class="empty-state" style="display: none;" data-recipes-target="emptyState">
-    <p>No recipes yet. Create your first recipe!</p>
+    <p id="empty-message">No recipes yet. Create your first recipe!</p>
     <%= link_to "Create Recipe", new_recipe_path, class: "btn btn-primary" %>
   </div>
 </div>

@@ -24,6 +24,24 @@ module Api
           # Render JUST the array (This makes your website work again!)
           render json: @recipes.as_json(include: [:user, :tags, :ingredients])
         end
+
+      # GET /api/v1/recipes/my_recipes
+      def my_recipes
+        doorkeeper_authorize!
+        
+        recipes_scope = current_user.recipes.includes(:user, :tags, :ingredients).order(created_at: :desc)
+        
+        # Paginate
+        @pagy, @recipes = pagy(recipes_scope, page: params[:page], limit: params[:per_page])
+
+        # Send pagination info in headers
+        response.headers['X-Total-Count'] = @pagy.count.to_s
+        response.headers['X-Total-Pages'] = @pagy.pages.to_s
+
+        # Render the user's recipes
+        render json: @recipes.as_json(include: [:user, :tags, :ingredients])
+      end
+
       def latest
              @recipe = Recipe.includes(:user, :tags, :ingredients, :recipe_ingredients)
                   .order(created_at: :desc)
@@ -32,7 +50,7 @@ module Api
         if @recipe
           render json: @recipe.as_json(
             include: {
-              user: { only: [:id, :email] },
+              user: { only: [:id, :name, :email] },
               tags: { only: [:id, :tag_name] },
               ingredients: { only: [:id, :name] },
               recipe_ingredients: { only: [:id, :ingredient_id, :quantity, :unit] }
@@ -48,7 +66,7 @@ module Api
       def show
         render json: @recipe.as_json(
           include: {
-            user: { only: [:id, :email] },
+            user: { only: [:id, :name, :email] },
             tags: { only: [:id, :tag_name] },
             ingredients: { only: [:id, :name] },
             recipe_ingredients: { only: [:id, :ingredient_id, :quantity, :unit] },
@@ -68,7 +86,7 @@ module Api
         if @recipe.save
           render json: @recipe.as_json(
             include: {
-              user: { only: [:id, :email] },
+              user: { only: [:id, :name, :email] },
               tags: { only: [:id, :tag_name] },
               ingredients: { only: [:id, :name] },
               recipe_ingredients: { only: [:id, :ingredient_id, :quantity, :unit] }
@@ -85,7 +103,7 @@ module Api
         if @recipe.update(recipe_params)
           render json: @recipe.as_json(
             include: {
-              user: { only: [:id, :email] },
+              user: { only: [:id, :name, :email] },
               tags: { only: [:id, :tag_name] },
               ingredients: { only: [:id, :name] },
               recipe_ingredients: { only: [:id, :ingredient_id, :quantity, :unit] }

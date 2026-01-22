@@ -30,6 +30,7 @@ Rails.application.routes.draw do
       resources :recipes, only: [:index, :show, :create, :update, :destroy] do
         collection do
           get 'latest'
+          get 'my_recipes'
         end
         resources :comments, only: [:index, :create]
       end

@@ -2,25 +2,79 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["grid", "emptyState"]
+  static targets = ["grid", "emptyState", "allRecipesTab", "myRecipesTab"]
 
   connect() {
     console.log("Recipes controller connected")
+    this.currentView = "all"
     this.loadRecipes()
   }
 
-  async loadRecipes() {
+  loadRecipes() {
+    if (this.currentView === "all") {
+      this.loadAllRecipes()
+    } else {
+      this.loadMyRecipes()
+    }
+  }
+
+  async loadAllRecipes() {
+    this.currentView = "all"
+    this.updateTabStyles("all")
+    
     try {
       const apiController = this.getApiController()
-      const response = await apiController.get('/api/v1/recipes')  // ← NOW using API controller!
+      const response = await apiController.get('/api/v1/recipes')
       
       if (!response.ok) throw new Error('Failed to load recipes')
 
       const recipes = await response.json()
       this.renderRecipes(recipes)
+      this.updateEmptyStateMessage("No recipes yet. Create your first recipe!")
     } catch (error) {
       console.error('Error loading recipes:', error)
       this.showError('Failed to load recipes')
+    }
+  }
+
+  async loadMyRecipes() {
+    this.currentView = "my"
+    this.updateTabStyles("my")
+    
+    try {
+      const apiController = this.getApiController()
+      const response = await apiController.get('/api/v1/recipes/my_recipes')
+      
+      if (response.status === 401) {
+        alert('Please log in to view your recipes')
+        this.loadAllRecipes()
+        return
+      }
+      
+      if (!response.ok) throw new Error('Failed to load your recipes')
+
+      const recipes = await response.json()
+      this.renderRecipes(recipes)
+      this.updateEmptyStateMessage("You haven't created any recipes yet. Create one now!")
+    } catch (error) {
+      console.error('Error loading my recipes:', error)
+      this.showError('Failed to load your recipes')
+    }
+  }
+
+  updateTabStyles(activeView) {
+    if (this.hasAllRecipesTabTarget) {
+      this.allRecipesTabTarget.classList.toggle('active', activeView === 'all')
+    }
+    if (this.hasMyRecipesTabTarget) {
+      this.myRecipesTabTarget.classList.toggle('active', activeView === 'my')
+    }
+  }
+
+  updateEmptyStateMessage(message) {
+    const messageElement = document.getElementById("empty-message")
+    if (messageElement) {
+      messageElement.textContent = message
     }
   }
 
@@ -40,12 +94,29 @@ export default class extends Controller {
 
     const tagsHTML = tags ? `<div class="tags">${tags}</div>` : ''
 
+    // Get current user ID from data attribute
+    const currentUserId = parseInt(this.element.dataset.currentUserId)
+    const isOwnRecipe = recipe.user && recipe.user.id === currentUserId
+    const badgeHTML = isOwnRecipe ? '<span class="my-recipe-badge">My Recipe</span>' : ''
+
+    // Format user info: "Name (email)"
+    const userName = recipe.user?.name || 'Unknown User'
+    const userEmail = recipe.user?.email || ''
+    const userInfo = userEmail ? `${userName} (${userEmail})` : userName
+
     return `
       <div class="recipe-card" 
            data-search-target="card"
            data-title="${recipe.title}"
-           data-tags="${recipe.tags?.map(t => t.tag_name).join(' ') || ''}">
-        <h2><a href="/recipes/${recipe.id}">${recipe.title}</a></h2>
+           data-tags="${recipe.tags?.map(t => t.tag_name).join(' ') || ''}"
+           ${isOwnRecipe ? 'data-own-recipe="true"' : ''}>
+        <div class="recipe-card-header">
+          <h2><a href="/recipes/${recipe.id}">${recipe.title}</a></h2>
+          ${badgeHTML}
+        </div>
+        <div class="recipe-user-info">
+          <p class="user-details">${userInfo}</p>
+        </div>
         <div class="recipe-meta">
           <p><strong>Prep Time:</strong> ${recipe.prep_time} mins</p>
           <p><strong>Servings:</strong> ${recipe.servings}</p>

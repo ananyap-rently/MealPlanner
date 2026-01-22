@@ -123,6 +123,18 @@ RSpec.describe Api::V1::RecipesController, type: :request do
         expect(first_comment['user']['email']).to eq(user.email)
       end
       
+      it 'includes user information with id, name, and email' do
+        get api_v1_recipe_path(recipe), headers: headers
+        json_response = JSON.parse(response.body)
+        
+        aggregate_failures do
+          expect(json_response['user']).to be_present
+          expect(json_response['user']['id']).to eq(user.id)
+          expect(json_response['user']['name']).to eq(user.name)
+          expect(json_response['user']['email']).to eq(user.email)
+        end
+      end
+      
       it 'includes recipe ingredients in JSON' do
         ingredient = create(:ingredient)
         create(:recipe_ingredient, 
@@ -187,6 +199,14 @@ RSpec.describe Api::V1::RecipesController, type: :request do
         expect(json_response['user']).to be_present
       end
 
+      it 'includes user id, name, and email in latest recipe' do
+        aggregate_failures do
+          expect(json_response['user']['id']).to eq(new_recipe.user.id)
+          expect(json_response['user']['name']).to eq(new_recipe.user.name)
+          expect(json_response['user']['email']).to eq(new_recipe.user.email)
+        end
+      end
+
       it 'includes the recipe ingredients list' do
         expect(json_response).to have_key('recipe_ingredients')
       end
@@ -209,6 +229,93 @@ RSpec.describe Api::V1::RecipesController, type: :request do
 
       it 'returns the correct error message' do
         expect(JSON.parse(response.body)['message']).to eq("No recipes found")
+      end
+    end
+  end
+
+  describe 'GET /api/v1/recipes/my_recipes' do
+    let(:user) { create(:user) }
+    let(:other_user) { create(:user) }
+    let(:token) { create(:doorkeeper_access_token, resource_owner_id: user.id) }
+    let(:other_token) { create(:doorkeeper_access_token, resource_owner_id: other_user.id) }
+    let(:headers) { { "Authorization" => "Bearer #{token.token}", "Accept" => "application/json" } }
+    let(:other_headers) { { "Authorization" => "Bearer #{other_token.token}", "Accept" => "application/json" } }
+
+    context 'when user is authenticated' do
+      context 'when user has recipes' do
+        let!(:user_recipes) { create_list(:recipe, 3, user: user) }
+        let!(:other_recipes) { create_list(:recipe, 2, user: other_user) }
+
+        it 'returns only current user recipes' do
+          get my_recipes_api_v1_recipes_path, headers: headers
+          json_response = JSON.parse(response.body)
+
+          aggregate_failures do
+            expect(json_response.size).to eq(3)
+            expect(json_response.map { |r| r['user_id'] }).to all(eq(user.id))
+          end
+        end
+
+        it 'returns recipes in descending order by created_at' do
+          get my_recipes_api_v1_recipes_path, headers: headers
+          json_response = JSON.parse(response.body)
+
+          recipe_ids = json_response.map { |r| r['id'] }
+          expect(recipe_ids).to eq(user_recipes.reverse.map(&:id))
+        end
+
+        it 'includes user information with id, name, and email' do
+          get my_recipes_api_v1_recipes_path, headers: headers
+          json_response = JSON.parse(response.body)
+
+          aggregate_failures do
+            expect(json_response.first['user']['id']).to eq(user.id)
+            expect(json_response.first['user']['name']).to eq(user.name)
+            expect(json_response.first['user']['email']).to eq(user.email)
+          end
+        end
+
+        # it 'includes tags for recipes' do
+        #   tag = create(:tag)
+        #   user_recipes.first.tags << tag
+
+        #   get my_recipes_api_v1_recipes_path, headers: headers
+        #   json_response = JSON.parse(response.body)
+
+        #   expect(json_response.first['tags']).to be_present
+        #   expect(json_response.first['tags'].size).to eq(1)
+        # end
+
+        # it 'includes ingredients for recipes' do
+        #   ingredient = create(:ingredient)
+        #   create(:recipe_ingredient, 
+        #          recipe: user_recipes.first, 
+        #          ingredient: ingredient,
+        #          quantity: '2',
+        #          unit: 'cups')
+
+        #   get my_recipes_api_v1_recipes_path, headers: headers
+        #   json_response = JSON.parse(response.body)
+
+        #   expect(json_response.first['recipe_ingredients']).to be_present
+        #   expect(json_response.first['recipe_ingredients'].size).to eq(1)
+        # end
+      end
+
+      context 'when user has no recipes' do
+        it 'returns an empty array' do
+          get my_recipes_api_v1_recipes_path, headers: headers
+          json_response = JSON.parse(response.body)
+
+          expect(json_response).to eq([])
+        end
+      end
+    end
+
+    context 'when user is not authenticated' do
+      it 'returns 401 unauthorized status' do
+        get my_recipes_api_v1_recipes_path
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
@@ -266,6 +373,18 @@ RSpec.describe Api::V1::RecipesController, type: :request do
           expect(json_response['title']).to eq('Chocolate Cake')
           expect(json_response['instructions']).to eq('Mix and bake')
           expect(json_response['prep_time'].to_f).to eq(30.0)
+        end
+        
+        it 'includes user information with id, name, and email in created recipe' do
+          post api_v1_recipes_path, params: { recipe: valid_attributes }, headers: headers
+          json_response = JSON.parse(response.body)
+          
+          aggregate_failures do
+            expect(json_response['user']).to be_present
+            expect(json_response['user']['id']).to eq(user.id)
+            expect(json_response['user']['name']).to eq(user.name)
+            expect(json_response['user']['email']).to eq(user.email)
+          end
         end
         
         it 'assigns the recipe to the current user' do
@@ -345,6 +464,18 @@ RSpec.describe Api::V1::RecipesController, type: :request do
           
           expect(json_response['title']).to eq('Updated Recipe Title')
           expect(json_response['prep_time'].to_f).to eq(45.0)
+        end
+        
+        it 'includes user information with id, name, and email in updated recipe' do
+          patch api_v1_recipe_path(recipe), params: { recipe: new_attributes }, headers: headers
+          json_response = JSON.parse(response.body)
+          
+          aggregate_failures do
+            expect(json_response['user']).to be_present
+            expect(json_response['user']['id']).to eq(user.id)
+            expect(json_response['user']['name']).to eq(user.name)
+            expect(json_response['user']['email']).to eq(user.email)
+          end
         end
       end
       

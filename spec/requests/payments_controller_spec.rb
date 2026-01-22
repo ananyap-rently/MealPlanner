@@ -79,6 +79,18 @@ RSpec.describe PaymentsController, type: :request do
           post payments_path, params: { shopping_list_item_id: new_shopping_item.id }
           expect(Payment.last.payment_status).to eq('pending')
         end
+
+        it 'handles payment save failure' do
+          new_shopping_item = create(:shopping_list_item, user: user)
+          allow_any_instance_of(Payment).to receive(:save).and_return(false)
+          
+          expect {
+            post payments_path, params: { shopping_list_item_id: new_shopping_item.id }
+          }.not_to change(Payment, :count)
+          
+          expect(response).to redirect_to(shopping_list_items_path)
+          expect(flash[:alert]).to eq("Failed to add item to payments.")
+        end
       end
 
       context 'when item is already added to payments' do
@@ -147,6 +159,16 @@ RSpec.describe PaymentsController, type: :request do
         patch payment_path(payment_to_update), params: { payment: { payment_status: 'completed' } }
         expect(flash[:notice]).to match(/Payment status updated to/)
       end
+
+      it 'handles payment update failure' do
+        payment_to_update = create(:payment, shopping_list_item: create(:shopping_list_item, user: user), payment_status: 'pending')
+        allow_any_instance_of(Payment).to receive(:update).and_return(false)
+        
+        patch payment_path(payment_to_update), params: { payment: { payment_status: 'completed' } }
+        
+        expect(response).to redirect_to(payments_path)
+        expect(flash[:alert]).to eq("Failed to update payment status.")
+      end
     end
 
     context 'when user is not the payment owner' do
@@ -198,6 +220,24 @@ RSpec.describe PaymentsController, type: :request do
         delete payment_path(payment_to_destroy)
         expect(flash[:notice]).to match(/removed from payments/)
       end
+
+      it 'includes item name in notice when purchasable is Item' do
+        item = create(:item, item_name: 'Apples')
+        shopping_list_item = create(:shopping_list_item, user: user, purchasable: item)
+        payment_to_destroy = create(:payment, shopping_list_item: shopping_list_item)
+        
+        delete payment_path(payment_to_destroy)
+        expect(flash[:notice]).to include('Apples')
+      end
+
+      it 'includes ingredient name in notice when purchasable is Ingredient' do
+        ingredient = create(:ingredient, name: 'Salt')
+        shopping_list_item = create(:shopping_list_item, user: user, purchasable: ingredient)
+        payment_to_destroy = create(:payment, shopping_list_item: shopping_list_item)
+        
+        delete payment_path(payment_to_destroy)
+        expect(flash[:notice]).to include('Salt')
+      end
     end
 
     context 'when user is not the payment owner' do
@@ -225,6 +265,45 @@ RSpec.describe PaymentsController, type: :request do
         expect {
           delete payment_path(payment)
         }.not_to change(Payment, :count)
+      end
+    end
+  end
+
+  describe '#get_item_name private method' do
+    context 'when purchasable is an Item' do
+      it 'returns the item_name' do
+        item = create(:item, item_name: 'Milk')
+        shopping_list_item = create(:shopping_list_item, user: user, purchasable: item)
+        payment = create(:payment, shopping_list_item: shopping_list_item)
+        
+        sign_in_as(user)
+        delete payment_path(payment)
+        expect(flash[:notice]).to include('Milk')
+      end
+    end
+
+    context 'when purchasable is an Ingredient' do
+      it 'returns the ingredient name' do
+        ingredient = create(:ingredient, name: 'Butter')
+        shopping_list_item = create(:shopping_list_item, user: user, purchasable: ingredient)
+        payment = create(:payment, shopping_list_item: shopping_list_item)
+        
+        sign_in_as(user)
+        delete payment_path(payment)
+        expect(flash[:notice]).to include('Butter')
+      end
+    end
+
+    context 'when purchasable type is unknown' do
+      it 'returns "Item" as default' do
+        # Create a shopping list item normally, then update its purchasable type and id
+        shopping_list_item = create(:shopping_list_item, user: user)
+        shopping_list_item.update_columns(purchasable_type: 'UnknownType', purchasable_id: 999)
+        payment = create(:payment, shopping_list_item: shopping_list_item)
+        
+        sign_in_as(user)
+        delete payment_path(payment)
+        expect(flash[:notice]).to include('Item')
       end
     end
   end

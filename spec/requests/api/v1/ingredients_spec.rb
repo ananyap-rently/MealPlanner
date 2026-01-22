@@ -70,6 +70,17 @@ RSpec.describe "Api::V1::Ingredients", type: :request do
         expect(response).to have_http_status(:created)
       end
 
+      it "returns unprocessable content when ingredient save fails" do
+        allow_any_instance_of(Ingredient).to receive(:save).and_return(false)
+        allow_any_instance_of(Ingredient).to receive(:errors).and_return(double(full_messages: ["Name can't be blank"]))
+        
+        post api_v1_ingredients_path, params: valid_params, headers: headers
+        
+        expect(response).to have_http_status(:unprocessable_content)
+        json = JSON.parse(response.body)
+        expect(json['errors']).to be_present
+      end
+
       it "returns bad request when ingredient parameter is missing" do
         post api_v1_ingredients_path, params: {}, headers: headers
         
