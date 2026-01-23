@@ -25,7 +25,7 @@ module Api
           prev_page:    pagy.prev,
           total_pages:  pagy.pages,
           total_count:  pagy.count,
-          per_page:     pagy.limit # In Pagy 9.x, use 'limit' instead of 'items'
+          per_page:     pagy.limit 
         }
       end
      

@@ -102,17 +102,14 @@ RSpec.describe "Api::V1::MealPlans", type: :request do
         get api_v1_meal_plan_path(meal_plan), headers: headers
         json = JSON.parse(response.body)
 
-        # Validate the meal plan data
-        expect(json['meal_plan']['id']).to eq(meal_plan.id)
-        
-        # Validate comments array
-        expect(json['comments']).not_to be_empty
-        expect(json['comments'].first['content']).to eq(comment.content)
-        expect(json['comments'].first['user']['id']).to eq(user.id)
-
-        # Validate items_by_date structure
-        expect(json['items_by_date']).not_to be_empty
-        expect(json['items_by_date'][Date.today.to_s]).not_to be_empty
+        aggregate_failures "validating API response structure" do
+          expect(json['meal_plan']['id']).to eq(meal_plan.id)
+          expect(json['comments']).not_to be_empty
+          expect(json['comments'].first['content']).to eq(comment.content)
+          expect(json['comments'].first['user']['id']).to eq(user.id)
+          expect(json['items_by_date']).not_to be_empty
+          expect(json['items_by_date'][Date.today.to_s]).not_to be_empty
+        end
       end
 
       it "returns plannable with title when respond_to title is true" do

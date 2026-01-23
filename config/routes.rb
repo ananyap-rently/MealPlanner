@@ -40,11 +40,19 @@ Rails.application.routes.draw do
         delete :clear_purchased
       end
     end
+
     resources :payments, only: [:index, :create, :update, :destroy] do
+      member do
+        patch :restore              # NEW - restore soft-deleted payment
+        delete :permanent   # NEW - optional permanent delete
+      end
       collection do
         delete :clear_completed
+        get :deleted               # NEW - optional, view deleted payments
+        #delete :permanent_clear_all 
       end
     end
+
     resources :meal_plans do
       resources :comments, only: [:index, :create]
       resources :meal_plan_items, only: [:create, :destroy] do

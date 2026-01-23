@@ -21,7 +21,6 @@ RSpec.describe PaymentsController, type: :request do
   describe 'GET /payments' do
     context 'when user is authenticated' do
       before do
-        # sign_in user
         sign_in_as(user)
       end
       
@@ -58,7 +57,6 @@ RSpec.describe PaymentsController, type: :request do
   describe 'POST /payments' do
     context 'when user is authenticated' do
       before do
-        # sign_in user
         sign_in_as(user)
       end
       
@@ -138,7 +136,6 @@ RSpec.describe PaymentsController, type: :request do
   describe 'PATCH /payments/:id' do
     context 'when user is the payment owner' do
       before do
-        # sign_in user
         sign_in_as(user)
       end
       
@@ -148,9 +145,11 @@ RSpec.describe PaymentsController, type: :request do
         patch payment_path(payment_to_update), params: { payment: { payment_status: 'completed' } }
         
         payment_to_update.reload
-        expect(payment_to_update.payment_status).to eq('completed')
-        expect(response).to redirect_to(payments_path)
-        expect(flash[:notice]).to eq("✓ Payment status updated to Completed.")
+        aggregate_failures "testing database update and response" do
+          expect(payment_to_update.payment_status).to eq('completed')
+          expect(response).to redirect_to(payments_path)
+          expect(flash[:notice]).to eq("✓ Payment status updated to Completed.")
+        end
       end
 
       it 'sets success notice with capitalized status' do
@@ -197,7 +196,7 @@ RSpec.describe PaymentsController, type: :request do
   describe 'DELETE /payments/:id' do
     context 'when user is the payment owner' do
       before do
-        # sign_in user 
+         
         sign_in_as(user)
       end
       

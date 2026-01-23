@@ -7,19 +7,6 @@ RSpec.describe "Api::V1::MealPlanItems", type: :request do
   let(:meal_plan) { create(:meal_plan, user: user) }
   let(:recipe) { create(:recipe, title: "Pasta Carbonara") }
 
-  # describe "GET /api/v1/meal_plans/:meal_plan_id/meal_plan_items" do
-  #   let!(:meal_item1) { create(:meal_plan_item, meal_plan: meal_plan, plannable: recipe, scheduled_date: Date.today, meal_slot: "dinner") }
-  #   let!(:meal_item2) { create(:meal_plan_item, meal_plan: meal_plan, plannable: recipe, scheduled_date: Date.tomorrow, meal_slot: "lunch") }
-
-  #   it "returns all meal plan items ordered by scheduled_date and meal_slot" do
-  #     get api_v1_meal_plan_meal_plan_items_path(meal_plan), headers: headers
-  #     expect(response).to have_http_status(:ok)
-  #     json = JSON.parse(response.body)
-  #     expect(json['meal_plan_items'].count).to eq(2)
-  #     expect(json['meal_plan_items'].first['id']).to eq(meal_item1.id)
-  #   end
-  # end
-
   describe "POST /api/v1/meal_plans/:meal_plan_id/meal_plan_items" do
     context "with valid Recipe params" do
       let(:params) do

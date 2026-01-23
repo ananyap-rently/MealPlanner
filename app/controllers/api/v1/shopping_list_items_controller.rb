@@ -29,27 +29,7 @@ module Api
           }
         end
 
-      # def index
-      #   @shopping_list_items = current_user.shopping_list_items
-      #                                      .includes(:purchasable, :payment)
-      #                                      .order(created_at: :desc)
-        
-      #   render json: @shopping_list_items.map { |item|
-      #     {
-      #       id: item.id,
-      #       quantity: item.quantity,
-      #       is_purchased: item.is_purchased,
-      #       purchasable_type: item.purchasable_type,
-      #       purchasable_id: item.purchasable_id,
-      #       has_payment: item.payment.present?,
-      #       created_at: item.created_at,
-      #       purchasable: item.purchasable ? purchasable_json(item.purchasable, item.purchasable_type) : nil
-      #     }
-      #   }
-      # end
-      # app/controllers/api/v1/shopping_list_items_controller.rb
-
-
+      
       # POST /api/v1/shopping_list_items
       def create
         purchasable = find_or_create_purchasable

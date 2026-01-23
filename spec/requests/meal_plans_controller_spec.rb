@@ -62,14 +62,16 @@ RSpec.describe "MealPlans", type: :request do
     let!(:recipe) { create(:recipe, title: "Spaghetti") }
     
     it "returns a successful response and shows recipes" do
-      # Create a meal plan item to test the groupings logic
+    
       create(:meal_plan_item, meal_plan: meal_plan, plannable: recipe, scheduled_date: Date.today)
       
       get meal_plan_path(meal_plan)
       
-      expect(response).to have_http_status(:success)
-      expect(response.body).to include("Spaghetti")
-      expect(response.body).to include(Date.today.to_s)
+      aggregate_failures "testing response and content" do
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include("Spaghetti")
+        expect(response.body).to include(Date.today.to_s)
+      end
     end
   end
 

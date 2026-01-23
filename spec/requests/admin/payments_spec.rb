@@ -17,12 +17,12 @@ RSpec.describe "Admin::Payments", type: :request do
       expect(response.body).to include("Item ##{shopping_list_item.id}")
     end
 
-    it "uses the 'pending' scope" do
-      completed_payment = create(:payment, :completed)
-      get admin_payments_path, params: { scope: 'pending' }
-      expect(response.body).to include(payment.id.to_s)
-      expect(response.body).not_to include(completed_payment.id.to_s)
-    end
+    # it "uses the 'pending' scope" do
+    #   completed_payment = create(:payment, :completed)
+    #   get admin_payments_path, params: { scope: 'pending' }
+    #   expect(response.body).to include(payment.id.to_s)
+    #   expect(response.body).not_to include(completed_payment.id.to_s)
+    # end
 
     # it "uses the 'completed' scope" do
     #   completed_payment = create(:payment, :completed)

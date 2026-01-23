@@ -25,42 +25,7 @@ RSpec.describe "Admin::Recipes", type: :request do
     end
   end
 
-#   describe "POST /admin/recipes" do
-#     context "with valid nested attributes" do
-#       let(:recipe_params) do
-#         {
-#           recipe: {
-#             title: "New Pasta #{SecureRandom.hex(4)}",
-#             user_id: user.id,
-#             prep_time: 15,
-#             servings: 2,
-#             instructions: "Boil water, add pasta.",
-#             tag_ids: [tag.id],
-#             recipe_ingredients_attributes: {
-#               "0" => {
-#                 ingredient_id: ingredient.id,
-#                 quantity: "100"
-#               }
-#             }
-#           },
-#           commit: "Create Recipe"
-#         }
-#       end
 
-#       it "creates a recipe with ingredients and tags" do
-#         expect {
-#           post admin_recipes_path, params: recipe_params
-#         }.to change(Recipe, :count).by(1)
-#          .and change(RecipeIngredient, :count).by(1)
-
-#         recipe = Recipe.last
-#         expect(recipe.title).to include("New Pasta")
-#         expect(recipe.tags).to include(tag)
-#         expect(recipe.recipe_ingredients.first.quantity).to eq("100")
-#         expect(recipe.recipe_ingredients.first.ingredient).to eq(ingredient)
-#       end
-#     end
-#   end
 
   describe "PATCH /admin/recipes/:id" do
     let!(:recipe) { create(:recipe, user: user) }

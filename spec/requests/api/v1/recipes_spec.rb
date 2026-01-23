@@ -275,31 +275,7 @@ RSpec.describe Api::V1::RecipesController, type: :request do
           end
         end
 
-        # it 'includes tags for recipes' do
-        #   tag = create(:tag)
-        #   user_recipes.first.tags << tag
-
-        #   get my_recipes_api_v1_recipes_path, headers: headers
-        #   json_response = JSON.parse(response.body)
-
-        #   expect(json_response.first['tags']).to be_present
-        #   expect(json_response.first['tags'].size).to eq(1)
-        # end
-
-        # it 'includes ingredients for recipes' do
-        #   ingredient = create(:ingredient)
-        #   create(:recipe_ingredient, 
-        #          recipe: user_recipes.first, 
-        #          ingredient: ingredient,
-        #          quantity: '2',
-        #          unit: 'cups')
-
-        #   get my_recipes_api_v1_recipes_path, headers: headers
-        #   json_response = JSON.parse(response.body)
-
-        #   expect(json_response.first['recipe_ingredients']).to be_present
-        #   expect(json_response.first['recipe_ingredients'].size).to eq(1)
-        # end
+        
       end
 
       context 'when user has no recipes' do

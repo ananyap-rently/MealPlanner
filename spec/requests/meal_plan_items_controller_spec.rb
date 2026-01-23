@@ -12,7 +12,7 @@ RSpec.describe "MealPlanItems", type: :request do
         create(:meal_plan_item, meal_plan: meal_plan, scheduled_date: Date.today, plannable: recipe)
         get meal_plan_path(meal_plan)
         expect(response).to have_http_status(:ok)
-        # This ensures the .group_by { ... } block in the controller is executed
+        
       end
     end
   describe "POST /create" do
@@ -29,7 +29,7 @@ RSpec.describe "MealPlanItems", type: :request do
   }
 
   expect(response).to have_http_status(:unprocessable_content)
-  #expect(flash[:notice]).to include("Item")
+  
 end
 
     end
