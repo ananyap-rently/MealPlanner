@@ -556,6 +556,7 @@ DEPENDENCIES
   pundit
   rails (~> 8.1.1)
   rspec-rails (~> 8.0)
+  rubocop
   rubocop-rails-omakase
   sassc-rails
   selenium-webdriver
